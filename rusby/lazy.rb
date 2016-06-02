@@ -11,15 +11,14 @@ module Rusby
 
       define_method(name) do |*args, &blk|
         if (self.class.instance_variable_get("@rusby_watches_#{name}"))
-          puts "first run of #{name}"
+          puts "-> first run of #{name}"
           self.class.instance_variable_set("@rusby_watches_#{name}", false)
           result = orig_method.bind(self).call(*args, &blk)
           convertion_result = self.class.convert_to_rust(name, orig_method, result, *args, &blk)
           result
         else
-          puts "second run of #{name}"
-          puts self.class.instance_variable_get("@rusby_runs_#{name}")
-          puts "Running native RUST!"
+          puts "-> second run of #{name}"
+          puts "\u2605\u2605\u2605  Running Rust! Yeeeah Baby! \u2605\u2605\u2605"
           puts Proxy.send(name, *args)
         end
       end
@@ -34,7 +33,7 @@ module Rusby
         file.write(code)
       end
 
-      puts "Compiling #{signature}"
+      puts "Compiling #{signature}..."
       `rustc --crate-type=dylib -o #{root_path}/#{name}.dylib #{root_path}/#{name}.rs`
 
       Proxy.rusby_load name
