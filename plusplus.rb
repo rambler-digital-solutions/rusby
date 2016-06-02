@@ -11,12 +11,7 @@ class FanaticPluser
   def plusplus(number)
     number + 1
   end
-
-  def minusminus(number)
-    number - 1
-  end
 end
 
 pluser = FanaticPluser.new
-pluser.plusplus(1)
-pluser.plusplus(2)
+2.times { pluser.plusplus(1) }

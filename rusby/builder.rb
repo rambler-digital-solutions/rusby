@@ -8,16 +8,16 @@ module Rusby
     extend self
 
     TYPES = {
-      "Fixnum" => "i64"
-    }
+      'Fixnum' => 'i64'
+    }.freeze
 
     STYPES = {
-      "Fixnum" => "int"
-    }
+      'Fixnum' => 'int'
+    }.freeze
 
     def method_to_rust(ast, arg_types, return_type)
       result = [
-        "#[no_mangle]"
+        '#[no_mangle]'
       ]
 
       name = ast.children.first
@@ -31,9 +31,9 @@ module Rusby
         ast_to_rust(node, result)
       end
 
-      result << "}"
+      result << '}'
 
-      signature = "#{STYPES[return_type.to_s]} #{name}(#{arg_types.map{|arg| STYPES[arg.to_s]}.join(', ')})"
+      signature = "#{STYPES[return_type.to_s]} #{name}(#{arg_types.map { |arg| STYPES[arg.to_s] }.join(', ')})"
       [signature, result.join("\n")]
     end
 
@@ -51,9 +51,9 @@ module Rusby
         ast.children.each do |node|
           ast_to_rust(node, r2)
         end
-        result << r2.join(" ")
+        result << r2.join(' ')
       when :lvar
-        ast_to_rust(ast.children[0], result, )
+        ast_to_rust(ast.children[0], result)
       when :int
         ast_to_rust(ast.children[0], result)
       end

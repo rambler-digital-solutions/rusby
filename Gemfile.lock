@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.2.0)
+    benchmark-ips (2.6.1)
     byebug (9.0.5)
     method_source (0.8.2)
     parser (2.3.1.0)
@@ -11,6 +12,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  benchmark-ips
   byebug
   method_source
   parser
