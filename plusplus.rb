@@ -24,19 +24,51 @@ module Rs
     orig_method = instance_method(name)
     Rusty::dlload "./lib/lib#{name}.#{libext}"
     define_method(name) do |*args, &blk|
-      Rusty.extern "int plusplus(int)"
-      Rusty.send(name, *args)
-      # result = orig_method.bind(self).call(*args, &blk)
-      # self.class.rusty(name, orig_method, result, *args, &blk)
-      # result
+      # Rusty.extern "int plusplus(int)"
+      # Rusty.send(name, *args)
+
+      result = orig_method.bind(self).call(*args, &blk)
+      self.class.rusty(name, orig_method, result, *args, &blk)
+      result
+    end
+  end
+
+
+  def ast_to_rust(ast, result)
+    puts "-> processing #{ast}"
+    unless ast.respond_to? :type
+      result << ast
+      return
+    end
+
+    case ast.type
+    when :def
+      args = ast.children[1].children.map{|ch| ch.children[0].to_s + ': ???'}.join(', ')
+      result << "pub extern \"C\" fn #{ast.children.first}(#{args}) -> ??? {"
+      ast.children[2,10].each do |node|
+        ast_to_rust(node, result)
+      end
+      result << "}"
+    when :send
+      r2 = []
+      ast.children.each do |node|
+        ast_to_rust(node, r2)
+      end
+      result << r2.join(" ")
+    when :lvar
+      ast_to_rust(ast.children[0], result, )
+    when :int
+      ast_to_rust(ast.children[0], result)
     end
   end
 
   def rusty(name, orig_method, result, *args)
-    extern "int plusplus(int)"
-
     puts orig_method.source
-    p Parser::CurrentRuby.parse(orig_method.source)
+    ast = Parser::CurrentRuby.parse(orig_method.source)
+    puts "All done"
+    result = ["#[no_mangle]"]
+    ast_to_rust(ast, result)
+    puts result.join("\n")
     puts "rusty called for #{name} with #{args.map(&:class)} -> #{result.class}"
     result
   end
