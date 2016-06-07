@@ -9,9 +9,8 @@ module Rusby
       return 'so' if `uname` =~ /Linux/
     end
 
-    def self.rusby_load(name)
-      root_path = "#{File.dirname(__FILE__)}/../lib"
-      ffi_lib "#{root_path}/#{name}.#{libext}"
+    def self.rusby_load(fullpath)
+      ffi_lib "#{fullpath}.#{libext}"
     end
   end
 end

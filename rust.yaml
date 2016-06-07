@@ -1,0 +1,10 @@
+types:
+  Fixnum: :i64
+
+c_types:
+  Fixnum: :int
+
+method_declaration_prefix:
+  - '#[no_mangle]'
+
+method_prefix: 'pub extern "C" fn '

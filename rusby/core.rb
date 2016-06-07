@@ -1,5 +1,7 @@
 module Rusby
   module Core
+    MIN_BOOST_PERCENT = -50 # heh, have to change the sign
+
     # DSL
     def rust_method!
       @rusby_awaits_method = true
@@ -15,7 +17,7 @@ module Rusby
 
       boost = Profiler.benchit(bound_method, rust_method, args)
       resulting_method = method_reference
-      if boost > -50 # heh, have to change the sign
+      if boost > MIN_BOOST_PERCENT
         puts "\u2605\u2605\u2605  Running Rust! Yeeeah Baby! \u2605\u2605\u2605"
         resulting_method = ->(*args) { rust_method.call(*args) }
       end

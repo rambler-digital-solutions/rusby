@@ -1,49 +1,44 @@
 require 'method_source'
 require 'parser/current'
-
-Parser::Builders::Default.emit_lambda = true # opt-in to most recent AST format
+require 'yaml'
+require 'hashie'
 
 module Rusby
   module Builder
     extend self
 
-    TYPES = {
-      'Fixnum' => 'i64'
-    }.freeze
+    def root_path
+      @root ||= File.expand_path('../..', __FILE__)
+    end
 
-    STYPES = {
-      'Fixnum' => 'int'
-    }.freeze
+    def rust
+      @rust ||= Hashie::Mash.new YAML.load_file("#{root_path}/rust.yaml")
+    end
 
     def convert_to_rust(name, orig_method, result, *args)
       ast = Parser::CurrentRuby.parse(orig_method.source)
       signature, code = Builder.method_to_rust(ast, args.map(&:class), result.class)
       instance_variable_set("@rusby_runs_#{name}", signature)
-      root_path = "#{File.dirname(__FILE__)}/../lib"
-      File.open("#{root_path}/#{name}.rs", 'w') do |file|
-        file.write(code)
-      end
+      File.open("#{root_path}/lib/#{name}.rs", 'w') { |file| file.write(code) }
 
-      puts "Compiling #{signature}..."
-      puts `rustc --crate-type=dylib -O -o #{root_path}/#{name}.dylib #{root_path}/#{name}.rs`
+      puts "Compiling #{signature.last} #{name}(#{signature.first.join(', ')})..."
+      puts `rustc --crate-type=dylib -O -o #{root_path}/lib/#{name}.dylib #{root_path}/lib/#{name}.rs`
 
-      Proxy.rusby_load name
-      Proxy.attach_function name, [:int], :int
+      Proxy.rusby_load "#{root_path}/lib/#{name}"
+      Proxy.attach_function name, *signature
 
       Proxy.method(name)
     end
 
     def method_to_rust(ast, arg_types, return_type)
-      result = [
-        '#[no_mangle]'
-      ]
+      result = rust.method_declaration_prefix
 
       name = ast.children.first
       args = ast.children[1].children.each_with_index.map do |child, i|
-        "#{child.children[0]}: #{TYPES[arg_types[i].to_s]}"
+        "#{child.children[0]}: #{rust.types[arg_types[i]]}"
       end
 
-      result << "pub extern \"C\" fn #{name}(#{args.join(', ')}) -> #{TYPES[return_type.to_s]} {"
+      result << "#{rust.method_prefix} #{name}(#{args.join(', ')}) -> #{rust.types[return_type]} {"
 
       ast.children[2..-1].each do |node|
         ast_to_rust(node, result)
@@ -51,7 +46,7 @@ module Rusby
 
       result << '}'
 
-      signature = "#{STYPES[return_type.to_s]} #{name}(#{arg_types.map { |arg| STYPES[arg.to_s] }.join(', ')})"
+      signature = [arg_types.map { |arg| rust.c_types[arg] }, rust.c_types[return_type]]
       [signature, result.join("\n")]
     end
 
