@@ -1,15 +1,8 @@
 require 'ffi'
 
-# Fiddle.module_eval do
-#   def self.last_error
-#   end
-#   def self.last_error=(arg)
-#   end
-# end
-
 module Rusby
   module Proxy
-    extend FFI::Library
+    extend ::FFI::Library
 
     def self.libext
       return 'dylib' if `uname` =~ /Darwin/

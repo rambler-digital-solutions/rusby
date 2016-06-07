@@ -1,11 +1,12 @@
+require 'rubygems'
+require 'bundler/setup'
+
 require 'byebug'
 
-require './rusby/lazy'
-require './rusby/builder'
-require './rusby/proxy'
+Dir["./rusby/*.rb"].each {|file| require file }
 
 class FanaticPluser
-  extend Rusby::Lazy
+  extend Rusby::Core
 
   rust_method!
   def plusplus(number)

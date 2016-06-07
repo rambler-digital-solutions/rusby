@@ -15,6 +15,24 @@ module Rusby
       'Fixnum' => 'int'
     }.freeze
 
+    def convert_to_rust(name, orig_method, result, *args)
+      ast = Parser::CurrentRuby.parse(orig_method.source)
+      signature, code = Builder.method_to_rust(ast, args.map(&:class), result.class)
+      instance_variable_set("@rusby_runs_#{name}", signature)
+      root_path = "#{File.dirname(__FILE__)}/../lib"
+      File.open("#{root_path}/#{name}.rs", 'w') do |file|
+        file.write(code)
+      end
+
+      puts "Compiling #{signature}..."
+      puts `rustc --crate-type=dylib -O -o #{root_path}/#{name}.dylib #{root_path}/#{name}.rs`
+
+      Proxy.rusby_load name
+      Proxy.attach_function name, [:int], :int
+
+      Proxy.method(name)
+    end
+
     def method_to_rust(ast, arg_types, return_type)
       result = [
         '#[no_mangle]'

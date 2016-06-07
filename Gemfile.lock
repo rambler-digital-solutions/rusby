@@ -4,6 +4,7 @@ GEM
     ast (2.2.0)
     benchmark-ips (2.6.1)
     byebug (9.0.5)
+    ffi (1.9.10)
     method_source (0.8.2)
     parser (2.3.1.0)
       ast (~> 2.2)
@@ -15,6 +16,7 @@ PLATFORMS
 DEPENDENCIES
   benchmark-ips
   byebug
+  ffi
   method_source
   parser
   ruby-prof
