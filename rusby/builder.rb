@@ -1,7 +1,5 @@
-require 'method_source'
-require 'parser/current'
+require 'parser/ruby22'
 require 'yaml'
-require 'hashie'
 
 module Rusby
   module Builder
@@ -16,7 +14,7 @@ module Rusby
     end
 
     def convert_to_rust(name, orig_method, result, *args)
-      ast = Parser::CurrentRuby.parse(orig_method.source)
+      ast = Parser::Ruby22.parse(orig_method.source)
       signature, code = Builder.method_to_rust(ast, args.map(&:class), result.class)
       instance_variable_set("@rusby_runs_#{name}", signature)
       File.open("#{root_path}/lib/#{name}.rs", 'w') { |file| file.write(code) }

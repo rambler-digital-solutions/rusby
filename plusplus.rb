@@ -1,9 +1,7 @@
 require 'rubygems'
-require 'bundler'
-require 'byebug'
+require 'bundler/setup'
 
-Bundler.require(:default)
-
+Bundler.require
 Dir['./rusby/*.rb'].each { |file| require file }
 
 class FanaticPluser

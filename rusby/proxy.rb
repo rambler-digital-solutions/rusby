@@ -1,5 +1,3 @@
-require 'ffi'
-
 module Rusby
   module Proxy
     extend ::FFI::Library
