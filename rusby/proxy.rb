@@ -1,9 +1,15 @@
-require 'fiddle'
-require 'fiddle/import'
+require 'ffi'
+
+# Fiddle.module_eval do
+#   def self.last_error
+#   end
+#   def self.last_error=(arg)
+#   end
+# end
 
 module Rusby
   module Proxy
-    extend Fiddle::Importer
+    extend FFI::Library
 
     def self.libext
       return 'dylib' if `uname` =~ /Darwin/
@@ -11,7 +17,8 @@ module Rusby
     end
 
     def self.rusby_load(name)
-      dlload "./lib/#{name}.#{libext}"
+      root_path = "#{File.dirname(__FILE__)}/../lib"
+      ffi_lib "#{root_path}/#{name}.#{libext}"
     end
   end
 end

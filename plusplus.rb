@@ -14,4 +14,6 @@ class FanaticPluser
 end
 
 pluser = FanaticPluser.new
-2.times { pluser.plusplus(1) }
+2.times do |i|
+  puts "== #{i + 1} - #{pluser.plusplus(77)}"
+end

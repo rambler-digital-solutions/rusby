@@ -7,6 +7,7 @@ GEM
     method_source (0.8.2)
     parser (2.3.1.0)
       ast (~> 2.2)
+    ruby-prof (0.15.9)
 
 PLATFORMS
   ruby
@@ -16,6 +17,7 @@ DEPENDENCIES
   byebug
   method_source
   parser
+  ruby-prof
 
 BUNDLED WITH
    1.12.4

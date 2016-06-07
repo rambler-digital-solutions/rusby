@@ -1,13 +1,30 @@
 require 'benchmark/ips'
+require 'ruby-prof'
+require 'benchmark'
 
-def timeit
+def benchit
   Benchmark.ips do |x|
-    x.time = 10
-    x.warmup = 2
+    x.time = 3
+    x.warmup = 1
     x.report('yield') { yield }
     x.compare!
   end
 end
+
+def stopwatch_start
+end
+
+def stopwatch_stop
+end
+
+def timeit
+  RubyProf.start
+  1e5.to_i.times { yield }
+  result = RubyProf.stop
+  printer = RubyProf::FlatPrinter.new(result)
+  printer.print(STDOUT)
+end
+
 
 module Rusby
   module Lazy
@@ -27,7 +44,10 @@ module Rusby
           bound_method = orig_method.bind(self)
           result = bound_method.call(*args)
 
-          timeit { bound_method.call(*args) }
+          start = Time.now
+          1_000_000.times { bound_method.call(*args) }
+          finish = Time.now
+          puts finish - start
 
           convertion_result = self.class.convert_to_rust(name, orig_method, result, *args)
           result
@@ -35,9 +55,14 @@ module Rusby
           puts "-> second run of #{name}"
           puts "\u2605\u2605\u2605  Running Rust! Yeeeah Baby! \u2605\u2605\u2605"
 
-          timeit { Proxy.send(name, *args) }
+          start = Time.now
+          1_000_000.times { Proxy.send(name, *args) }
+          finish = Time.now
+          puts finish - start
 
-          puts Proxy.send(name, *args)
+          # puts "NOOOO!!! #{Fiddle.last_error}" if Fiddle.last_error
+          # raise SystemCallError.new(Fiddle.last_error)
+          Proxy.send(name, *args)
         end
       end
     end
@@ -52,10 +77,11 @@ module Rusby
       end
 
       puts "Compiling #{signature}..."
-      `rustc --crate-type=dylib -o #{root_path}/#{name}.dylib #{root_path}/#{name}.rs`
+      puts `rustc --crate-type=dylib -O -o #{root_path}/#{name}.dylib #{root_path}/#{name}.rs`
+      # puts `ls -al #{root_path}/#{name}.dylib`
 
       Proxy.rusby_load name
-      Proxy.extern signature
+      Proxy.attach_function name, [:int], :int
 
       signature
     end
