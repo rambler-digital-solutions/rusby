@@ -1,3 +1,10 @@
+# Quickstart
+```
+bundle
+ruby boot.rb
+```
+
+## Notes
 https://github.com/michaelfairley/method_decorators
 
 Thread-safe fiddle:

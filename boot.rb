@@ -3,15 +3,7 @@ require 'bundler/setup'
 
 Bundler.require
 Dir['./rusby/*.rb'].each { |file| require file }
-
-class FanaticPluser
-  extend Rusby::Core
-
-  rust_method!
-  def plusplus(number)
-    number + 1
-  end
-end
+Dir['./examples/*.rb'].each { |file| require file }
 
 pluser = FanaticPluser.new
 2.times do |i|
