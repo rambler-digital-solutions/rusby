@@ -1,8 +1,9 @@
 types:
   Fixnum: :i64
-
+  Array: array_placeholder
 c_types:
   Fixnum: :int
+  Array: c_array_placeholder
 
 method_declaration_prefix:
   - '#[no_mangle]'

@@ -10,10 +10,15 @@ module Rusby
     private
 
     def rusby_method_proxy(object, method_name, method_reference, args)
+      # just call ruby method and record result
       bound_method = method_reference.bind(object)
       result = bound_method.call(*args)
 
-      rust_method = Builder.convert_to_rust(method_name, method_reference, result, *args)
+      # if we are converting recursive function
+      # we need to wait for it to exit all recursive calls
+      return result if caller.any?{|entry| entry.include?("rusby_method_proxy")}
+
+      rust_method = Builder.convert_to_rust(method_name, method_reference, object, result, *args)
 
       boost = Profiler.benchit(bound_method, rust_method, args)
       resulting_method = method_reference
