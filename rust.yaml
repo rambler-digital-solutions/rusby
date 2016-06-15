@@ -5,7 +5,6 @@ c_types:
   Fixnum: :int
   Array: c_array_placeholder
 
-method_declaration_prefix:
-  - '#[no_mangle]'
+method_declaration_prefix: '#[no_mangle]'
 
 method_prefix: 'pub extern "C" fn '
