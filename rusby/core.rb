@@ -16,7 +16,7 @@ module Rusby
 
       # if we are converting recursive function
       # we need to wait for it to exit all recursive calls
-      return result if caller.any?{|entry| entry.include?("rusby_method_proxy")}
+      return result if caller.any? { |entry| entry.include?('rusby_method_proxy') }
 
       rust_method = Builder.convert_to_rust(method_name, method_reference, object, result, *args)
 

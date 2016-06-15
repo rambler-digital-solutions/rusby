@@ -11,7 +11,7 @@ Dir['./examples/*.rb'].each { |file| require file }
 # end
 
 sorter = Quicksort.new
-a = (1..5).map { |i| rand(10)  }
+a = (1..5).map { |_i| rand(10) }
 
 1.times do |i|
   puts "== #{i + 1} - #{sorter.quicksort(a.clone, 0, a.size - 1)}"

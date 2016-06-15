@@ -4,11 +4,25 @@ GEM
     ast (2.2.0)
     benchmark-ips (2.6.1)
     byebug (9.0.5)
+    diff-lcs (1.2.5)
     ffi (1.9.10)
     hashie (3.4.4)
     method_source (0.8.2)
     parser (2.3.1.0)
       ast (~> 2.2)
+    rspec (3.4.0)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-mocks (3.4.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
     ruby-prof (0.15.9)
 
 PLATFORMS
@@ -21,6 +35,7 @@ DEPENDENCIES
   hashie
   method_source
   parser
+  rspec
   ruby-prof
 
 BUNDLED WITH
