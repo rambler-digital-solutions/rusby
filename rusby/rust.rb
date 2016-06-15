@@ -2,9 +2,20 @@ module Rusby
   module Rust
     extend self
 
+    def set_locals(*args)
+      @locals ||= []
+      @locals |= args.map(&:to_sym)
+      p @locals
+    end
+
+    def flush_locals(*args)
+      @locals ||= []
+      @locals |= args.map(&:to_sym)
+    end
+
     def generate(ast)
       return ast unless ast.respond_to?(:type)
-      result = send("generate_#{ast.type}", ast)
+      result = send("generate_#{ast.type.to_s.tr('-', '_')}", ast)
     end
 
     def generate_begin(ast)
@@ -12,7 +23,6 @@ module Rusby
     end
 
     def generate_args(_ast)
-      puts 'doing nothing'
     end
 
     def generate_if(ast)
@@ -28,16 +38,15 @@ module Rusby
         ast.children.map { |node| generate(node) }.join(' ')
       else
         ri = ast.children[2..-1].map { |node| generate(node) }
-        if @method_name == ast.children[1]
-          "#{ast.children[1]}(#{ri.join(', ')});"
-        else
-          "/*undefined(#{ast.children[1]})*/"
-        end
+        result = "#{ast.children[1]}(#{ri.join(', ')});"
+        result = 'inline_method_' + result unless @locals.include?(ast.children[1])
+        result
       end
     end
 
     def generate_lvasgn(ast)
-      "let mut #{ast.children[0]} = #{generate(ast.children[1])};"
+      return ast.children[0] if ast.children.size == 1
+      "#{ast.children[0]} = #{generate(ast.children[1])};"
     end
 
     def generate_lvar(ast)
@@ -45,7 +54,7 @@ module Rusby
     end
 
     def generate_int(ast)
-      generate(ast.children[0])
+      ast.children[0]
     end
 
     def generate_return(ast)
@@ -81,7 +90,7 @@ module Rusby
         "let mut lv#{i} = #{generate(right[i])};"
       end
       result += left.each_with_index.map do |statement, i|
-        "#{statement.children.first} = lv#{i};"
+        "#{generate(statement)} = lv#{i};"
       end
       result.join("\n")
     end
@@ -101,6 +110,10 @@ module Rusby
 
     def generate_array(_ast)
       'Vec::new()'
+    end
+
+    def generate_op_asgn(ast)
+      "#{generate(ast.children[0])} #{ast.children[1]}= #{generate(ast.children[2])}"
     end
   end
 end

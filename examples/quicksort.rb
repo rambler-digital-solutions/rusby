@@ -1,6 +1,7 @@
 class Quicksort
   extend Rusby::Core
 
+  rust_method!
   def quicksort(a, lo, hi)
     return unless lo < hi
     pivot = partition(a, lo, hi)
@@ -11,7 +12,6 @@ class Quicksort
 
   private
 
-  rust_method!
   def partition(a, lo, hi)
     pivot = a[lo]
     i = lo - 1
