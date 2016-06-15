@@ -15,29 +15,30 @@ module Rusby
 
     def postprocess(code)
       # fold the array syntax
-      code.gsub!(/(\w+) \[\] (\w+)/, '\1[\2]')
-      code.gsub!(/(\w+) \[\]= (\w+) =/, '\1[\2] =')
+      code.gsub!(/(\w+) \[\] (\w+)/, '\1[\2 as usize]')
+      code.gsub!(/(\w+) \[\]= (\w+) =/, '\1[\2 as usize] =')
     end
 
-    def convert_to_rust(name, orig_method, owner, result, *args)
-      signature, code = main_method(
+    def convert_to_rust(meta, method_name, orig_method, owner)
+      signature, code = construct_method(
         orig_method.source,
-        args.map(&:class),
-        result.class
+        meta[method_name][:args],
+        meta[method_name][:result]
       )
-      expand_inline_methods(code, owner)
+      code = internal_methods(meta, code, owner)
       postprocess(code)
 
-      File.open("#{root_path}/lib/#{name}.rs", 'w') { |file| file.write(code) }
-      `rustfmt #{root_path}/lib/#{name}.rs`
-      File.open("#{root_path}/lib/#{name}.rs") { |file| puts file.read }
+      File.open("#{root_path}/lib/#{method_name}.rs", 'w') { |file| file.write(code) }
+      `rustfmt #{root_path}/lib/#{method_name}.rs`
+      File.open("#{root_path}/lib/#{method_name}.rs") { |file| puts file.read }
 
-      puts "Compiling #{signature.last} #{name}(#{signature.first.join(', ')})..."
-      # puts `rustc --crate-type=dylib -O -o #{root_path}/lib/#{name}.dylib #{root_path}/lib/#{name}.rs`
+      puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})..."
+      puts `rustc --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
 
-      # Proxy.rusby_load "#{root_path}/lib/#{name}"
-      # Proxy.attach_function name, *signature
-      #
+      Proxy.rusby_load "#{root_path}/lib/#{method_name}"
+      Proxy.attach_function method_name, *signature
+
+      return
       # Proxy.method(name)
     end
 
@@ -52,23 +53,30 @@ module Rusby
       result
     end
 
-    def expand_inline_methods(code, owner)
-      code.gsub!(/inline_method_(\w+)\([^\)]+\)/) do
-        source = owner.method(Regexp.last_match(1)).source
-        ast = Parser::Ruby22.parse(source)
-        rust_method_body(ast)
+    def internal_methods(meta, code, owner)
+      result = code
+      code.scan(/internal_method_(\w+)\([^\)]+\)/)[0].each do |method_name|
+        source = owner.method(method_name).source
+        result += construct_method(
+          source,
+          meta[method_name.to_sym][:args],
+          meta[method_name.to_sym][:result],
+          false
+        )[1]
       end
+      return result
     end
 
-    def main_method(source, arg_types, return_type)
-      result = rust.method_declaration_prefix + "\n"
+    def construct_method(source, arg_types, return_type, exposed = true)
+      result = exposed ? rust.method_declaration_prefix_extern + "\n" : ''
+      result += rust.method_declaration_prefix
 
       ast = Parser::Ruby22.parse(source)
       args = ast.children[1].children.each_with_index.map do |child, i|
         "#{child.children[0]}: #{rust.types[arg_types[i]]}"
       end
 
-      result += "#{rust.method_prefix} #{ast.children[0]}(#{args.join(', ')}) -> #{rust.types[return_type]} {"
+      result += "#{exposed ? rust.method_prefix : ''} fn #{exposed ? '' : 'internal_method_'}#{ast.children[0]}(#{args.join(', ')}) -> #{rust.types[return_type]} {"
       result += rust_method_body(ast)
       result += '}'
 

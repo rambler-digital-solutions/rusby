@@ -1,10 +1,12 @@
 types:
-  Fixnum: :i64
-  Array: array_placeholder
+  Fixnum: 'i32'
+  Array: '&mut [i32]'
+  NilClass: '()'
 c_types:
-  Fixnum: :int
-  Array: c_array_placeholder
+  Fixnum: 'int'
+  Array: 'int[]'
+  NilClass: 'void'
 
-method_declaration_prefix: '#[no_mangle]'
-
-method_prefix: 'pub extern "C" fn '
+method_declaration_prefix_extern: "#[no_mangle]\n"
+method_declaration_prefix: "#[allow(unused_mut)]\n"
+method_prefix: 'pub extern "C"'

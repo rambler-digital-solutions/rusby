@@ -3,9 +3,7 @@ module Rusby
     extend self
 
     def set_locals(*args)
-      @locals ||= []
-      @locals |= args.map(&:to_sym)
-      p @locals
+      @locals = args.map(&:to_sym)
     end
 
     def flush_locals(*args)
@@ -39,14 +37,19 @@ module Rusby
       else
         ri = ast.children[2..-1].map { |node| generate(node) }
         result = "#{ast.children[1]}(#{ri.join(', ')});"
-        result = 'inline_method_' + result unless @locals.include?(ast.children[1])
+        result = 'internal_method_' + result unless @locals.include?(ast.children[1])
         result
       end
     end
 
     def generate_lvasgn(ast)
       return ast.children[0] if ast.children.size == 1
-      "#{ast.children[0]} = #{generate(ast.children[1])};"
+      result = "#{ast.children[0]} = #{generate(ast.children[1])};"
+      unless @locals.include? ast.children[0]
+        result = "let mut " + result
+        @locals << ast.children[0]
+      end
+      result
     end
 
     def generate_lvar(ast)
@@ -87,7 +90,7 @@ module Rusby
 
       result = []
       result += right.each_with_index.map do |_statement, i|
-        "let mut lv#{i} = #{generate(right[i])};"
+        "let lv#{i} = #{generate(right[i])};"
       end
       result += left.each_with_index.map do |statement, i|
         "#{generate(statement)} = lv#{i};"

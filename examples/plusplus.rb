@@ -1,7 +1,7 @@
 class FanaticPluser
   extend Rusby::Core
 
-  rust_method!
+  rusby!
   def plusplus(number)
     number + 1
   end

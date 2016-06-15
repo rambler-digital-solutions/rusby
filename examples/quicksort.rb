@@ -1,17 +1,15 @@
 class Quicksort
   extend Rusby::Core
 
-  rust_method!
+  rusby!
   def quicksort(a, lo, hi)
     return unless lo < hi
     pivot = partition(a, lo, hi)
     quicksort(a, lo, pivot)
     quicksort(a, pivot + 1, hi)
-    a
   end
 
   private
-
   def partition(a, lo, hi)
     pivot = a[lo]
     i = lo - 1
