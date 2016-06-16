@@ -2,12 +2,18 @@ module Rusby
   module Core
     MIN_BOOST_PERCENT = -50 # heh, have to change the sign
 
+    # next method should be added to the rusby table
     def rusby!
       @rusby_awaits_method = true
     end
 
+    def rusby_replace_method(method_name, method_reference)
+      @rusby_skips_method = true
+      define_method(method_name, method_reference)
+    end
+
+    # proxy method that records arg and result types
     def rusby_method_proxy(object, method_name, method_reference, args)
-      # just call ruby method and record result
       bound_method = method_reference.bind(object)
       result = bound_method.call(*args)
 
@@ -15,35 +21,48 @@ module Rusby
       @rusby_method_table[method_name][:result] = result.class
 
       unless @rusby_method_table[method_name][:exposed]
-        @rusby_method_deaf = true
-        define_method(method_name, method_reference)
-        return result
+        # if we don't need to convert method to rust return back the original method
+        rusby_replace_method(method_name, method_reference)
+      else
+        # try to convert to rust or return back the original method
+        rusby_convert_or_bust(method_name, method_reference, object)
       end
 
+      result
+    end
+
+    def rusby_convert_or_bust(method_name, method_reference, object)
       # if we are converting recursive function
       # we need to wait for it to exit all recursive calls
-      return result if caller.any? { |entry| entry.include?("'#{method_name}'") }
+      return if caller.any? { |entry| entry.include?("'#{method_name}'") }
 
-      rust_method = Builder.convert_to_rust(@rusby_method_table, method_name, method_reference, object)
+      rust_method = Builder.convert_to_rust(
+        @rusby_method_table,
+        method_name,
+        method_reference,
+        object
+      )
 
+      # check if rust method is running faster than the original one
       boost = Profiler.benchit(bound_method, rust_method, args)
+
+      # coose between rust and ruby methods
       resulting_method = method_reference
       if boost > MIN_BOOST_PERCENT
         puts "\u2605\u2605\u2605  Running Rust! Yeeeah Baby! \u2605\u2605\u2605"
         resulting_method = ->(*args) { rust_method.call(*args) }
       end
 
-      define_method(method_name, resulting_method)
-
-      result
+      # set chosen method permanently
+      rusby_replace_method(method_name, resulting_method)
     end
 
     # module callbacks
     def method_added(method_name)
       super
 
-      if @rusby_method_deaf
-        @rusby_method_deaf = false
+      if @rusby_skips_method
+        @rusby_skips_method = false
         return
       end
 
