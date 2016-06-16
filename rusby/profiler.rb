@@ -17,7 +17,7 @@ module Rusby
       m2 = 0
 
       SQRT_ITERATIONS.times do |i|
-        m1 += timeit(original_method, *args)
+        # m1 += timeit(original_method, *args)
         m2 += timeit(modified_method, *args)
         puts "#{i + 1} of #{SQRT_ITERATIONS} done."
       end
