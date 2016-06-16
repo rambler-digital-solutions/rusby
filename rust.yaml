@@ -1,12 +1,20 @@
+wrapper_exp:
+  Array[Fixnum]: 'let <name> = unsafe { std::slice::from_raw_parts_mut(<name>_pointer, <name>_size) };'
+wrapper_types:
+  Array[Fixnum]: '<name>_pointer: *mut i32, <name>_size: usize'
+wrapper_return_types:
+  Array[Fixnum]: '*const i32'
 types:
   Fixnum: 'i32'
-  Array: '&mut [i32]'
+  Array[Fixnum]: '&mut [i32]'
   NilClass: '()'
 c_types:
   Fixnum: 'int'
-  Array: 'pointer'
+  Array[Fixnum]: 'pointer'
   NilClass: 'void'
+type_map:
+  Array[Fixnum]: 'array_fixnum'
 
-method_declaration_prefix_extern: "#[no_mangle]\n"
+method_declaration_prefix_extern: "#[allow(unused_imports)]\nuse std::io::{self, Write};\n#[no_mangle]\n"
 method_declaration_prefix: "#[allow(unused_mut)]\n"
 method_prefix: 'pub extern "C"'

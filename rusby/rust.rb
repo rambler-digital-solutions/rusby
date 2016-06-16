@@ -36,10 +36,15 @@ module Rusby
       if ast.children[0]
         ast.children.map { |node| generate(node) }.join(' ')
       else
-        ri = ast.children[2..-1].map { |node| generate(node) }
-        result = "#{ast.children[1]}(#{ri.join(', ')});"
-        result = 'internal_method_' + result unless @locals.include?(ast.children[1])
-        result
+        case ast.children[1]
+        when :puts
+          "\nprintln!(\"{}\", #{generate(ast.children[2])});io::stdout().flush().unwrap();\n"
+        else
+          ri = ast.children[2..-1].map { |node| generate(node) }
+          result = "#{ast.children[1]}(#{ri.join(', ')});"
+          result = 'internal_method_' + result unless @locals.include?(ast.children[1])
+          result
+        end
       end
     end
 
@@ -47,7 +52,7 @@ module Rusby
       return ast.children[0] if ast.children.size == 1
       result = "#{ast.children[0]} = #{generate(ast.children[1])};"
       unless @locals.include? ast.children[0]
-        result = "let mut " + result
+        result = 'let mut ' + result
         @locals << ast.children[0]
       end
       result
@@ -61,9 +66,13 @@ module Rusby
       ast.children[0]
     end
 
+    def generate_str(ast)
+      "\"#{ast.children[0]}\""
+    end
+
     def generate_return(ast)
       ri = ast.children.map { |node| generate(node) }
-      "return #{ri.join(',')};"
+      "return #{ri.any? ? ri.join(',') : '&-ptr'};"
     end
 
     def generate_block(ast)

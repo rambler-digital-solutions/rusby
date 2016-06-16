@@ -36,9 +36,9 @@ module Rusby
       puts `rustc --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
 
       Proxy.rusby_load "#{root_path}/lib/#{method_name}"
-      Proxy.attach_function method_name, *signature
+      Proxy.attach_function "ffi_#{method_name}", *signature
 
-      Proxy.method(method_name)
+      Proxy.method("ffi_#{method_name}")
     end
 
     def rust_method_body(ast)
@@ -64,24 +64,45 @@ module Rusby
           false
         )[1]
       end
-      return result
+      result
     end
 
     def construct_method(source, arg_types, return_type, exposed = true)
-      result = exposed ? rust.method_declaration_prefix_extern + "\n" : ''
+      result = exposed ? "\n#{rust.method_declaration_prefix_extern}\n" : ''
       result += rust.method_declaration_prefix
 
       ast = Parser::Ruby22.parse(source)
-      args = ast.children[1].children.each_with_index.map do |child, i|
-        "#{child.children[0]}: #{rust.types[arg_types[i]]}"
+      method_name = ast.children[0]
+      arg_names = ast.children[1].children.map { |ch| ch.children[0].to_s }
+
+      if exposed
+        args = arg_names.each_with_index.map do |arg_name, i|
+          if rust.wrapper_types[arg_types[i]]
+            rust.wrapper_types[arg_types[i]].gsub('<name>', arg_name)
+          else
+            "#{arg_name}: #{rust.types[arg_types[i]]}"
+          end
+        end
+        result += "\n\n#{rust.method_prefix} fn ffi_#{method_name}(#{args.join(', ')}) -> #{rust.wrapper_return_types[return_type]} {\n"
+        args = arg_names.each_with_index.map do |arg_name, i|
+          if rust.wrapper_exp[arg_types[i]]
+            result += "\n#{rust.wrapper_exp[arg_types[i]].gsub('<name>', arg_name)}\n"
+          end
+        end
+        result += "return #{method_name}(#{arg_names.join(', ')}).as_ptr();"
+        result += "\n}\n\n"
       end
 
-      result += "#{exposed ? rust.method_prefix : ''} fn #{exposed ? '' : 'internal_method_'}#{ast.children[0]}(#{args.join(', ')}) -> #{rust.types[return_type]} {"
+      args = arg_names.each_with_index.map do |arg_name, i|
+        "#{arg_name}: #{rust.types[arg_types[i]]}"
+      end
+      result += "fn #{exposed ? '' : 'internal_method_'}#{method_name}(#{args.join(', ')}) -> #{rust.types[return_type]} {"
       result += rust_method_body(ast)
       result += '}'
 
+      s_args = arg_types.map { |arg| rust.c_types[arg].to_sym }
       signature = [
-        arg_types.map { |arg| rust.c_types[arg].to_sym },
+        s_args.map { |arg| arg == :pointer ? [arg, :int] : arg }.flatten,
         rust.c_types[return_type].to_sym
       ]
       [signature, result]
