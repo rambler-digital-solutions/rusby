@@ -1,13 +1,14 @@
 module Rusby
-  module Rust
-    extend self
+  class Rust
+    def initialize
+      @locals = []
+    end
 
     def set_locals(*args)
       @locals = args.map(&:to_sym)
     end
 
     def flush_locals(*args)
-      @locals ||= []
       @locals |= args.map(&:to_sym)
     end
 

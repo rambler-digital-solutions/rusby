@@ -4,7 +4,7 @@ types:
   NilClass: '()'
 c_types:
   Fixnum: 'int'
-  Array: 'int[]'
+  Array: 'pointer'
   NilClass: 'void'
 
 method_declaration_prefix_extern: "#[no_mangle]\n"

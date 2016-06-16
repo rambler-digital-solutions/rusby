@@ -38,17 +38,17 @@ module Rusby
       Proxy.rusby_load "#{root_path}/lib/#{method_name}"
       Proxy.attach_function method_name, *signature
 
-      return
-      # Proxy.method(name)
+      Proxy.method(method_name)
     end
 
     def rust_method_body(ast)
       name = ast.children.first
-      Rust.set_locals(name)
+      rust = Rust.new
+      rust.set_locals(name)
 
       result = ''
       ast.children[2..-1].each do |node|
-        result += Rust.generate(node)
+        result += rust.generate(node)
       end
       result
     end
@@ -80,7 +80,10 @@ module Rusby
       result += rust_method_body(ast)
       result += '}'
 
-      signature = [arg_types.map { |arg| rust.c_types[arg] }, rust.c_types[return_type]]
+      signature = [
+        arg_types.map { |arg| rust.c_types[arg].to_sym },
+        rust.c_types[return_type].to_sym
+      ]
       [signature, result]
     end
   end

@@ -25,13 +25,13 @@ module Rusby
         rusby_replace_method(method_name, method_reference)
       else
         # try to convert to rust or return back the original method
-        rusby_convert_or_bust(method_name, method_reference, object)
+        rusby_convert_or_bust(method_name, method_reference, object, args)
       end
 
       result
     end
 
-    def rusby_convert_or_bust(method_name, method_reference, object)
+    def rusby_convert_or_bust(method_name, method_reference, object, args)
       # if we are converting recursive function
       # we need to wait for it to exit all recursive calls
       return if caller.any? { |entry| entry.include?("'#{method_name}'") }
@@ -44,7 +44,7 @@ module Rusby
       )
 
       # check if rust method is running faster than the original one
-      boost = Profiler.benchit(bound_method, rust_method, args)
+      boost = Profiler.benchit(method_reference.bind(object), rust_method, args)
 
       # coose between rust and ruby methods
       resulting_method = method_reference
@@ -74,7 +74,7 @@ module Rusby
         @rusby_method_table[method_name][:exposed] = true
       end
 
-      @rusby_method_deaf = true
+      @rusby_skips_method = true
       original_method = instance_method(method_name)
       define_method(method_name) do |*args|
         self.class.send(
