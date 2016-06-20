@@ -1,3 +1,3 @@
-- quicksort
 - something with strings
+- battle test on https://github.com/kanwei/algorithms
 - aggresive mode + test on sinatra/rspec
