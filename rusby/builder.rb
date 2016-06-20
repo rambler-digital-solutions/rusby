@@ -20,18 +20,20 @@ module Rusby
     end
 
     def convert_to_rust(meta, method_name, orig_method, owner)
-      signature, code = construct_method(
+      code = rust.file_header
+      code += construct_method(
         orig_method.source,
         meta[method_name][:args],
         meta[method_name][:result]
       )
-      code = internal_methods(meta, code, owner)
-      postprocess(code)
-
-      File.open("#{root_path}/lib/#{method_name}.rs", 'w') { |file| file.write(code) }
+      code = expand_internal_methods(meta, code, owner)
+      code = postprocess(code)
+      File.open("#{root_path}/lib/#{method_name}.rs", 'w') do |file|
+        file.write(code)
+      end
       `rustfmt #{root_path}/lib/#{method_name}.rs`
 
-      puts 'Generating source code'.colorize(:yellow)
+      puts 'Done generating source code'.colorize(:yellow)
       File.open("#{root_path}/lib/#{method_name}.rs") do |file|
         code = file.read
         code.split("\n").each_with_index do |line, i|
@@ -39,6 +41,14 @@ module Rusby
         end
       end
 
+      compile_and_load_rust(method_name, meta)
+    end
+
+    def compile_and_load_rust(method_name, meta)
+      signature = construct_signature(
+        meta[method_name][:args],
+        meta[method_name][:result]
+      )
       puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})".colorize(:yellow)
       puts `rustc --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
 
@@ -60,7 +70,7 @@ module Rusby
       result
     end
 
-    def internal_methods(meta, code, owner)
+    def expand_internal_methods(meta, code, owner)
       result = code
       code.scan(/internal_method_(\w+)\([^\)]+\)/)[0].each do |method_name|
         source = owner.method(method_name).source
@@ -69,13 +79,14 @@ module Rusby
           meta[method_name.to_sym][:args],
           meta[method_name.to_sym][:result],
           false
-        )[1]
+        )
       end
       result
     end
 
     def construct_method(source, arg_types, return_type, exposed = true)
       result = exposed ? "\n#{rust.method_declaration_prefix_extern}\n" : ''
+
       result += rust.method_declaration_prefix
 
       ast = Parser::Ruby22.parse(source)
@@ -107,12 +118,15 @@ module Rusby
       result += rust_method_body(ast)
       result += '}'
 
-      s_args = arg_types.map { |arg| rust.c_types[arg].to_sym }
-      signature = [
-        s_args.map { |arg| arg == :pointer ? [arg, :int] : arg }.flatten,
+      result
+    end
+
+    def construct_signature(arg_types, return_type)
+      args = arg_types.map { |arg| rust.c_types[arg].to_sym }
+      [
+        args.map { |arg| arg == :pointer ? [arg, :int] : arg }.flatten,
         rust.c_types[return_type].to_sym
       ]
-      [signature, result]
     end
   end
 end
