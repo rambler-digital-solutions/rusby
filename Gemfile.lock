@@ -4,6 +4,7 @@ GEM
     ast (2.2.0)
     benchmark-ips (2.6.1)
     byebug (9.0.5)
+    colorize (0.7.7)
     diff-lcs (1.2.5)
     ffi (1.9.10)
     hashie (3.4.4)
@@ -31,6 +32,7 @@ PLATFORMS
 DEPENDENCIES
   benchmark-ips
   byebug
+  colorize
   ffi
   hashie
   method_source

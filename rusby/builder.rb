@@ -30,9 +30,16 @@ module Rusby
 
       File.open("#{root_path}/lib/#{method_name}.rs", 'w') { |file| file.write(code) }
       `rustfmt #{root_path}/lib/#{method_name}.rs`
-      File.open("#{root_path}/lib/#{method_name}.rs") { |file| puts file.read }
 
-      puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})..."
+      puts 'Generating source code'.colorize(:yellow)
+      File.open("#{root_path}/lib/#{method_name}.rs") do |file|
+        code = file.read
+        code.split("\n").each_with_index do |line, i|
+          puts "#{(i + 1).to_s.rjust(3).colorize(:light_black)}.  #{line}"
+        end
+      end
+
+      puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})".colorize(:yellow)
       puts `rustc --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
 
       Proxy.rusby_load "#{root_path}/lib/#{method_name}"
