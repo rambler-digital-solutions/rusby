@@ -1,24 +1,26 @@
-wrapper_exp:
+ffi_to_rust:
   Array[Fixnum]: 'let <name> = unsafe { std::slice::from_raw_parts_mut(<name>_pointer, <name>_size) };'
-wrapper_types:
+ffi_to_rust_types:
   Array[Fixnum]: '<name>_pointer: *mut i32, <name>_size: usize'
-wrapper_return_types:
+rust_to_ffi:
+  Array[Fixnum]: 'return result.as_ptr();'
+rust_to_ffi_types:
   Array[Fixnum]: '*const i32'
-types:
+
+rust_types:
   Fixnum: 'i32'
   Array[Fixnum]: '&mut [i32]'
   NilClass: '()'
-c_types:
+ffi_types:
   Fixnum: 'int'
   Array[Fixnum]: 'pointer'
   NilClass: 'void'
-type_map:
-  Array[Fixnum]: 'array_fixnum'
 
 file_header: |
   #[allow(unused_imports)]
   use std::io::{self, Write};
-  #[no_mangle]
 
-method_declaration_prefix: "#[allow(unused_mut)]\n"
-method_prefix: 'pub extern "C"'
+method_prefix: "#[allow(unused_mut)]\n"
+exposed_method_prefix: |
+  #[no_mangle]
+  pub extern "C"
