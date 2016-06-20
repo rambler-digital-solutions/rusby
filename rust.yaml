@@ -20,7 +20,7 @@ file_header: |
   #[allow(unused_imports)]
   use std::io::{self, Write};
 
-method_prefix: "#[allow(unused_mut)]\n"
+method_prefix: "\n#[allow(unused_mut)]"
 exposed_method_prefix: |
   #[no_mangle]
   pub extern "C"

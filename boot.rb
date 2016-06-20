@@ -5,10 +5,10 @@ Bundler.require
 Dir['./rusby/**/*.rb'].each { |file| require file }
 Dir['./examples/*.rb'].each { |file| require file }
 
-# pluser = FanaticPluser.new
-# 2.times do |i|
-#   puts "== #{i + 1} - #{pluser.plusplus(77)}"
-# end
+pluser = FanaticPluser.new
+2.times do |i|
+  puts "== #{i + 1} - #{pluser.plusplus(77)}"
+end
 
 sorter = Quicksort.new
 a = (1..10).map { |_i| rand(100_000) }

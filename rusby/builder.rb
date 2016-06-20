@@ -15,8 +15,9 @@ module Rusby
 
     def postprocess(code)
       # fold the array syntax
-      code.gsub!(/(\w+) \[\] (\w+)/, '\1[\2 as usize]')
-      code.gsub!(/(\w+) \[\]= (\w+) =/, '\1[\2 as usize] =')
+      code = code.gsub(/(\w+) \[\] (\w+)/, '\1[\2 as usize]')
+      code = code.gsub(/(\w+) \[\]= (\w+) =/, '\1[\2 as usize] =')
+      code
     end
 
     def convert_to_rust(meta, method_name, orig_method, owner)
@@ -28,6 +29,7 @@ module Rusby
       )
       code = expand_internal_methods(meta, code, owner)
       code = postprocess(code)
+
       File.open("#{root_path}/lib/#{method_name}.rs", 'w') do |file|
         file.write(code)
       end
@@ -71,8 +73,11 @@ module Rusby
     end
 
     def expand_internal_methods(meta, code, owner)
+      method_names = code.scan(/internal_method_(\w+)\([^\)]+\)/)[0]
+      return code unless method_names
+
       result = code
-      code.scan(/internal_method_(\w+)\([^\)]+\)/)[0].each do |method_name|
+      method_names.each do |method_name|
         source = owner.method(method_name).source
         result += construct_method(
           source,
@@ -84,42 +89,45 @@ module Rusby
       result
     end
 
+    def ffi_wrapper(method_name, arg_names, arg_types, return_type)
+      args = arg_names.each_with_index.map do |arg_name, i|
+        if rust.ffi_to_rust_types[arg_types[i]]
+          rust.ffi_to_rust_types[arg_types[i]].gsub('<name>', arg_name)
+        else
+          "#{arg_name}: #{rust.rust_types[arg_types[i]]}"
+        end
+      end
+      result = [
+        '',
+        '// this function folds ffi arguments and unfolds result to ffi types'
+      ]
+      result << "#{rust.exposed_method_prefix} fn ffi_#{method_name}(#{args.join(', ')}) -> #{rust.rust_to_ffi_types[return_type] || rust.rust_types[return_type]} {"
+      args = arg_names.each_with_index.map do |arg_name, i|
+        next unless rust.ffi_to_rust[arg_types[i]] # for simple args we don't need any convertion
+        result << rust.ffi_to_rust[arg_types[i]].gsub('<name>', arg_name).to_s
+      end
+      result << "let result = #{method_name}(#{arg_names.join(', ')});" # calls the real method with ffi args folded
+      result << (rust.rust_to_ffi[return_type] || 'return result;')
+      result << '}'
+
+      result
+    end
+
     def construct_method(source, arg_types, return_type, exposed = true)
       ast = Parser::Ruby22.parse(source)
       method_name = ast.children[0]
       arg_names = ast.children[1].children.map { |ch| ch.children[0].to_s }
 
-      result = rust.method_prefix
-      if exposed
-        args = arg_names.each_with_index.map do |arg_name, i|
-          if rust.ffi_to_rust_types[arg_types[i]]
-            rust.ffi_to_rust_types[arg_types[i]].gsub('<name>', arg_name)
-          else
-            "#{arg_name}: #{rust.rust_types[arg_types[i]]}"
-          end
-        end
-        result = []
-        result << "#{rust.exposed_method_prefix} fn ffi_#{method_name}(#{args.join(', ')}) -> #{rust.rust_to_ffi_types[return_type]} {"
-        args = arg_names.each_with_index.map do |arg_name, i|
-          next unless rust.ffi_to_rust[arg_types[i]] # for simple args we don't need any convertion
-          result << rust.ffi_to_rust[arg_types[i]].gsub('<name>', arg_name).to_s
-        end
-        result << "let result = #{method_name}(#{arg_names.join(', ')});" # calls the real method with ffi args folded
-        result << rust.rust_to_ffi[return_type]
-        result << '}'
+      result = exposed ? ffi_wrapper(method_name, arg_names, arg_types, return_type) : []
+      result << rust.method_prefix
 
-        result << rust.method_prefix
-        result = result.join("\n")
-      end
+      args = arg_names.each_with_index.map { |arg_name, i| "#{arg_name}: #{rust.rust_types[arg_types[i]]}" }
 
-      args = arg_names.each_with_index.map do |arg_name, i|
-        "#{arg_name}: #{rust.rust_types[arg_types[i]]}"
-      end
-      result += "fn #{exposed ? '' : 'internal_method_'}#{method_name}(#{args.join(', ')}) -> #{rust.rust_types[return_type]} {"
-      result += rust_method_body(ast)
-      result += '}'
+      result << "fn #{exposed ? '' : 'internal_method_'}#{method_name}(#{args.join(', ')}) -> #{rust.rust_types[return_type]} {"
+      result << rust_method_body(ast)
+      result << '}'
 
-      result
+      result.join("\n")
     end
 
     def construct_signature(arg_types, return_type)
