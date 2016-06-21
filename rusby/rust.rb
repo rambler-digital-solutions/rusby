@@ -128,5 +128,10 @@ module Rusby
     def generate_op_asgn(ast)
       "#{generate(ast.children[0])} #{ast.children[1]}= #{generate(ast.children[2])}"
     end
+
+    # string interpolation
+    def generate_dstr(ast)
+      ast.children.map { |node| "(#{generate(node)}).to_string()" }.join(' + &')
+    end
   end
 end

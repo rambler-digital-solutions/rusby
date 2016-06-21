@@ -107,7 +107,7 @@ module Rusby
         result << rust.ffi_to_rust[arg_types[i]].gsub('<name>', arg_name).to_s
       end
       result << "let result = #{method_name}(#{arg_names.join(', ')});" # calls the real method with ffi args folded
-      result << (rust.rust_to_ffi[return_type] || 'return result;')
+      result << "return #{rust.rust_to_ffi[return_type] || 'result'};"
       result << '}'
 
       result

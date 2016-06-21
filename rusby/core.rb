@@ -1,6 +1,6 @@
 module Rusby
   module Core
-    BOOST_THRESHOLD = 10
+    BOOST_THRESHOLD = -1e6 # TODO: turn on
 
     # next method should be added to the rusby table
     def rusby!
@@ -68,7 +68,10 @@ module Rusby
 
       # coose between rust and ruby methods
       resulting_method = method_reference
-      resulting_method = wrapped_rust_method if boost > BOOST_THRESHOLD
+      if boost > BOOST_THRESHOLD
+        resulting_method = wrapped_rust_method
+        puts 'Choose Rust. Choose speed.'.colorize(:green)
+      end
 
       # set chosen method permanently
       rusby_replace_method(method_name, resulting_method)

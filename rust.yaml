@@ -1,24 +1,34 @@
 ffi_to_rust:
+  String: 'let <name> = unsafe { CStr::from_ptr(<name>_pointer).to_string_lossy().into_owned() };'
   Array[Fixnum]: 'let <name> = unsafe { std::slice::from_raw_parts_mut(<name>_pointer, <name>_size) };'
 ffi_to_rust_types:
+  String: '<name>_pointer: *const c_char'
   Array[Fixnum]: '<name>_pointer: *mut i32, <name>_size: usize'
 rust_to_ffi:
-  Array[Fixnum]: 'return result.as_ptr();'
+  String: 'CString::new(result).unwrap().as_ptr()'
+  Array[Fixnum]: 'result.as_ptr()'
 rust_to_ffi_types:
   Array[Fixnum]: '*const i32'
+  String: '*const c_char'
 
 rust_types:
   Fixnum: 'i32'
   Array[Fixnum]: '&mut [i32]'
   NilClass: '()'
+  String: 'String'
 ffi_types:
   Fixnum: 'int'
   Array[Fixnum]: 'pointer'
   NilClass: 'void'
+  String: 'string'
 
 file_header: |
   #[allow(unused_imports)]
   use std::io::{self, Write};
+  #[allow(unused_imports)]
+  use std::ffi::{CStr,CString};
+  #[allow(unused_imports)]
+  use std::os::raw::c_char;
 
 method_prefix: "\n#[allow(unused_mut)]"
 exposed_method_prefix: |
