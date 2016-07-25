@@ -2,17 +2,14 @@ module Rusby
   module Generators
     module Assignments
       def generate_lvasgn(ast)
-        return ast.children[0] if ast.children.size == 1
-        result = "#{ast.children[0]} = #{generate(ast.children[1])};"
-        unless @known_variables.include? ast.children[0]
-          result = 'let mut ' + result
-          @known_variables << ast.children[0]
-        end
-        result
+        variable = ast.children[0]
+        return variable if ast.children.size == 1
+        "#{'let mut ' unless recollect_variable?(variable)}#{variable} = #{generate(ast.children[1])};"
       end
 
       def generate_lvar(ast)
-        generate(ast.children[0])
+        variable = ast.children[0]
+        variable
       end
 
       def generate_masgn(ast)

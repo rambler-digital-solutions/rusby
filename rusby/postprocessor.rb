@@ -4,8 +4,8 @@ module Rusby
 
     def apply(code)
       # fold the array syntax
-      code = code.gsub(/(\w+) \[\] (\w+)/, '\1[\2 as usize]')
-      code = code.gsub(/(\w+) \[\]= (\w+) =/, '\1[\2 as usize] =')
+      code = code.gsub(/(\w+) \[\] (\w+)/, '\1[\2]')
+      code = code.gsub(/(\w+) \[\]= (\w+) =/, '\1[\2] =')
       code
     end
   end

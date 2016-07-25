@@ -56,7 +56,7 @@ module Rusby
     def rust_method_body(ast)
       name = ast.children.first
       rust = Rust.new
-      rust.add_known_method(name)
+      rust.remember_method(name)
 
       result = ''
       ast.children[2..-1].each do |node|

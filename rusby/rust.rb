@@ -16,13 +16,21 @@ module Rusby
       @known_variables = []
     end
 
-    def add_known_method(name)
-      @known_methods << name.to_sym
+    def recollect_method?(name)
+      method_name = name.to_sym
+      result = @known_methods.include?(method_name)
+      @known_methods << method_name
+      result
     end
+    alias remember_method recollect_method?
 
-    def add_known_variable(name)
-      @known_variables << name.to_sym
+    def recollect_variable?(name)
+      variable = name.to_sym
+      result = @known_methods.include?(variable)
+      @known_variables << variable
+      result
     end
+    alias remember_variable recollect_variable?
 
     def fold_arrays(nodes)
       result = []

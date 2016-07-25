@@ -1,10 +1,17 @@
 class Levenshtein
   extend Rusby::Core
 
+  def rust(f)
+  end
+
+  def rust_variable(f)
+  end
+
   rusby!
   def distance(s, t)
     m = s.length
     n = t.length
+
     return m if n == 0
     return n if m == 0
     d = Array.new(m + 1) { Array.new(n + 1) }
@@ -16,14 +23,14 @@ class Levenshtein
         d[i][j] = if s[i - 1] == t[j - 1]     # adjust index into string
                     d[i - 1][j - 1]           # no operation required
                   else
-                    [
-                      d[i - 1][j] + 1,        # deletion
-                      d[i][j - 1] + 1,        # insertion
-                      d[i - 1][j - 1] + 1     # substitution
-                    ].min
+                    deletion = d[i - 1][j] + 1
+                    insertion = d[i][j - 1] + 1
+                    substitution = d[i - 1][j - 1] + 1
+                    op = deletion < insertion ? deletion : insertion
+                    op < substitution ? op : substitution
                   end
       end
     end
-    return d[m][n]
+    d[m][n]
   end
 end
