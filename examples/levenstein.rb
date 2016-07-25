@@ -31,6 +31,6 @@ class Levenshtein
                   end
       end
     end
-    d[m][n]
+    return d[m][n]
   end
 end
