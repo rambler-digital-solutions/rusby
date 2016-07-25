@@ -13,22 +13,15 @@ module Rusby
       @rust ||= Hashie::Mash.new YAML.load_file("#{root_path}/rust.yaml")
     end
 
-    def postprocess(code)
-      # fold the array syntax
-      code = code.gsub(/(\w+) \[\] (\w+)/, '\1[\2 as usize]')
-      code = code.gsub(/(\w+) \[\]= (\w+) =/, '\1[\2 as usize] =')
-      code
-    end
-
     def convert_to_rust(meta, method_name, orig_method, owner)
       code = rust.file_header
       code += construct_method(
-        orig_method.source,
+        Preprocessor.apply(orig_method.source),
         meta[method_name][:args],
         meta[method_name][:result]
       )
       code = expand_internal_methods(meta, code, owner)
-      code = postprocess(code)
+      code = Postrocessor.apply(code)
 
       File.open("#{root_path}/lib/#{method_name}.rs", 'w') do |file|
         file.write(code)
@@ -63,7 +56,7 @@ module Rusby
     def rust_method_body(ast)
       name = ast.children.first
       rust = Rust.new
-      rust.set_locals(name)
+      rust.add_known_method(name)
 
       result = ''
       ast.children[2..-1].each do |node|
