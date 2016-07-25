@@ -1,13 +1,23 @@
 module Rusby
   module Generators
     module Conditionals
+
       def generate_if(ast)
-        inverted = ast.children[2]
-        condition = generate(ast.children[0])
-        condition = "!(#{condition})" if inverted
-        bulk = inverted ? ast.children[2] : ast.children[1]
-        "if #{condition} {\n#{generate(bulk)}\n}"
+        result = <<-EOF
+          if (#{generate(ast.children[0])}) {
+            #{generate(ast.children[1])}
+          }
+        EOF
+        if ast.children[2]
+          result += <<-EOF
+            else {
+              #{generate(ast.children[2])}
+            }
+          EOF
+        end
+        return result.strip
       end
+
     end
   end
 end
