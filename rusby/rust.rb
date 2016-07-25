@@ -11,9 +11,10 @@ module Rusby
     include ::Rusby::Generators::Strings
     include ::Rusby::Generators::Types
 
-    def initialize
+    def initialize(meta)
       @known_methods = []
       @known_variables = []
+      @meta = meta
     end
 
     def recollect_method?(name)

@@ -1,12 +1,6 @@
 class Levenshtein
   extend Rusby::Core
 
-  def rust(f)
-  end
-
-  def rust_variable(f)
-  end
-
   rusby!
   def distance(s, t)
     m = s.length
@@ -18,6 +12,7 @@ class Levenshtein
 
     (0..m).each { |i| d[i][0] = i }
     (0..n).each { |j| d[0][j] = j }
+
     (1..n).each do |j|
       (1..m).each do |i|
         d[i][j] = if s[i - 1] == t[j - 1]     # adjust index into string

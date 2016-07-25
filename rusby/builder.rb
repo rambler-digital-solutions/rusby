@@ -17,11 +17,10 @@ module Rusby
       code = rust.file_header
       code += construct_method(
         Preprocessor.apply(orig_method.source),
-        meta[method_name][:args],
-        meta[method_name][:result]
+        meta[method_name]
       )
       code = expand_internal_methods(meta, code, owner)
-      code = Postrocessor.apply(code)
+      code = Postrocessor.apply(code, meta[method_name])
 
       File.open("#{root_path}/lib/#{method_name}.rs", 'w') do |file|
         file.write(code)
@@ -53,9 +52,9 @@ module Rusby
       Proxy.method("ffi_#{method_name}")
     end
 
-    def rust_method_body(ast)
+    def rust_method_body(meta, ast)
       name = ast.children.first
-      rust = Rust.new
+      rust = Rust.new(meta)
       rust.remember_method(name)
 
       result = ''
@@ -74,8 +73,7 @@ module Rusby
         source = owner.method(method_name).source
         result += construct_method(
           source,
-          meta[method_name.to_sym][:args],
-          meta[method_name.to_sym][:result],
+          meta[method_name.to_sym],
           false
         )
       end
@@ -106,10 +104,14 @@ module Rusby
       result
     end
 
-    def construct_method(source, arg_types, return_type, exposed = true)
+    def construct_method(source, meta, exposed = true)
+      arg_types = meta[:args]
+      return_type = meta[:result]
+
       ast = Parser::Ruby22.parse(source)
       method_name = ast.children[0]
       arg_names = ast.children[1].children.map { |ch| ch.children[0].to_s }
+      meta[:names] = arg_names
 
       result = exposed ? ffi_wrapper(method_name, arg_names, arg_types, return_type) : []
       result << rust.method_prefix
@@ -117,7 +119,7 @@ module Rusby
       args = arg_names.each_with_index.map { |arg_name, i| "#{arg_name}: #{rust.rust_types[arg_types[i]]}" }
 
       result << "fn #{exposed ? '' : 'internal_method_'}#{method_name}(#{args.join(', ')}) -> #{rust.rust_types[return_type]} {"
-      result << rust_method_body(ast)
+      result << rust_method_body(meta, ast)
       result << '}'
 
       result.join("\n")

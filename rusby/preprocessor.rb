@@ -7,7 +7,7 @@ module Rusby
         /(\w+)\s?=\s?Array\.new\((.*)\)\s?{\s?Array\.new\((.*)\)\s?}/,
         'rust_variable :\1' \
         "\n" \
-        'rust "let mut \1 = vec![vec![0; \2]; \3];"'
+        'rust "let mut \1 = vec![vec![0; \3]; \2];"'
       )
       code
     end

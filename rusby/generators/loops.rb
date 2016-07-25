@@ -10,7 +10,11 @@ module Rusby
         # only works with numeric range e.g. (1..10).each {|i| ...}
         ri = ast.children[1..-1].map { |node| generate(node) }.compact
         range = ast.children[0].children[0].children[0]
-        "for #{ast.children[1].children[0].children[0]} in #{range.children[0].children[0]}..#{range.children[1].children[0]} {\n#{ri.join("\n")}\n}"
+        range_start = range.children[0].children[0]
+        range_end = "(#{range.children[1].children[0]} + 1)" # rust range is inclusive
+        range_variable = ast.children[1].children[0].children[0]
+
+        "for #{range_variable} in #{range_start}..#{range_end} {\n#{ri.join("\n")}\n}"
       end
 
       def generate_while(ast)

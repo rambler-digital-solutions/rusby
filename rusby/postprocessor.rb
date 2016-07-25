@@ -2,10 +2,13 @@ module Rusby
   module Postrocessor
     extend self
 
-    def apply(code)
+    def apply(code, meta)
       # fold the array syntax
-      code = code.gsub(/(\w+) \[\] (\w+)/, '\1[\2]')
-      code = code.gsub(/(\w+) \[\]= (\w+) =/, '\1[\2] =')
+      meta[:args].each_with_index do |el, idx|
+        if el == 'String'
+          code = code.gsub(/#{meta[:names][idx]}\[(.+?)\]/, "#{meta[:names][idx]}.chars().nth(\\1)")
+        end
+      end
       code
     end
   end

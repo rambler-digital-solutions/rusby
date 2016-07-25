@@ -24,7 +24,8 @@ Dir['./examples/*.rb'].each { |file| require file }
 
 measurer = Levenshtein.new
 
-params = %w(fire water)
-2.times do |_i|
-  measurer.distance(*params)
+params = %w(unimaginatively incomprehensibilities)
+2.times do |i|
+  puts '-----------'
+  puts "#{i + 1}: #{measurer.distance(*params)}"
 end
