@@ -26,7 +26,8 @@ module Rusby
           "let lv#{i} = #{generate(right[i])};"
         end
         result += left.each_with_index.map do |statement, i|
-          "#{generate(statement)} lv#{i};"
+          statement = generate(statement)
+          "#{statement =~ /=$/ ? statement : "#{statement} = " }lv#{i};"
         end
         result.join("\n")
       end

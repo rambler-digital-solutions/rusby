@@ -1,5 +1,5 @@
 describe Rusby::Rust do
-  subject { described_class.new }
+  subject { described_class.new('i32') }
 
   it 'converts simple assignment' do
     ast = Parser::Ruby22.parse('j = 2')
@@ -8,7 +8,7 @@ describe Rusby::Rust do
 
   it 'converts array index assignment' do
     ast = Parser::Ruby22.parse('a = []; i = 0; a[i] = 5')
-    expect(subject.generate(ast)).to eq("let mut a = Vec::new();\nlet mut i = 0;\na []= i 5")
+    expect(subject.generate(ast)).to eq("let mut a = Vec::new();\nlet mut i = 0;\na[i as usize]=5")
   end
 
   it 'converts multiple assignment' do
@@ -25,22 +25,22 @@ describe Rusby::Rust do
 
   it 'converts if operator' do
     ast = Parser::Ruby22.parse('if 3 > 2; true; end')
-    expect(subject.generate(ast)).to eq("if 3 > 2 {\ntrue\n}")
+    expect(subject.generate(ast)).to eq("if 3>2 {\ntrue\n}\n")
   end
 
   it 'converts unless operator' do
     ast = Parser::Ruby22.parse('unless 3 > 2; true; end')
-    expect(subject.generate(ast)).to eq("if !(3 > 2) {\ntrue\n}")
+    expect(subject.generate(ast)).to eq("if !(3>2) {\ntrue\n}\n")
   end
 
   it 'converts postfix if operator' do
     ast = Parser::Ruby22.parse('return 5 if 2 >= 1')
-    expect(subject.generate(ast)).to eq("if 2 >= 1 {\nreturn 5;\n}")
+    expect(subject.generate(ast)).to eq("if 2>=1 {\nreturn 5 as i32;\n}\n")
   end
 
   it 'converts postfix unless operator' do
     ast = Parser::Ruby22.parse('return 5 unless 2 >= 1')
-    expect(subject.generate(ast)).to eq("if !(2 >= 1) {\nreturn 5;\n}")
+    expect(subject.generate(ast)).to eq("if !(2>=1) {\nreturn 5 as i32;\n}\n")
   end
 
   it 'converts loop operator' do
@@ -50,11 +50,11 @@ describe Rusby::Rust do
 
   it 'converts while operator' do
     ast = Parser::Ruby22.parse('while 5 < 6 do; true; end')
-    expect(subject.generate(ast)).to eq("while 5 < 6 {\ntrue\n}")
+    expect(subject.generate(ast)).to eq("while 5<6 {\ntrue\n}")
   end
 
   it 'converts postfix while operator' do
     ast = Parser::Ruby22.parse('begin; false; end while 3 > 2')
-    expect(subject.generate(ast)).to eq("while {\nfalse;\n3 > 2\n}{}")
+    expect(subject.generate(ast)).to eq("while {\nfalse;\n3>2\n}{}")
   end
 end

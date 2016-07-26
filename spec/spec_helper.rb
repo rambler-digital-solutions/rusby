@@ -21,7 +21,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 Bundler.require
-Dir['./rusby/*.rb'].each { |file| require file }
+Dir['./rusby/**/*.rb'].each { |file| require file }
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

@@ -2,11 +2,12 @@ module Rusby
   module Generators
     module Conditionals
       def generate_if(ast)
-        if ast.children[1]
+        result = if ast.children[1]
           generate_regular_if(ast)
         else
           generate_unless(ast)
         end
+        result.gsub(/^\s+/, "")
       end
 
       def generate_unless(ast)
@@ -30,7 +31,7 @@ module Rusby
             }
           EOF
         end
-        result.strip
+        result
       end
     end
   end
