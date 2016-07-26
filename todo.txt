@@ -1,5 +1,2 @@
-- battle test on:
-  a. https://www.blackbytes.info/2016/05/weighted-random-numbers/
-  b. https://en.wikipedia.org/wiki/Levenshtein_distance
-- add readme
-- distribute as gem
+- https://www.blackbytes.info/2016/05/weighted-random-numbers/
+- gemify
