@@ -3,11 +3,11 @@ module Rusby
     module Conditionals
       def generate_if(ast)
         result = if ast.children[1]
-          generate_regular_if(ast)
-        else
-          generate_unless(ast)
+                   generate_regular_if(ast)
+                 else
+                   generate_unless(ast)
         end
-        result.gsub(/^\s+/, "")
+        result.gsub(/^\s+/, '')
       end
 
       def generate_unless(ast)

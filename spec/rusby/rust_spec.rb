@@ -57,4 +57,22 @@ describe Rusby::Rust do
     ast = Parser::Ruby22.parse('begin; false; end while 3 > 2')
     expect(subject.generate(ast)).to eq("while {\nfalse;\n3>2\n}{}")
   end
+
+  it 'converts puts' do
+    ast = Parser::Ruby22.parse('puts "test message"')
+    expect(subject.generate(ast)).to eq("\nprintln!(\"{}\", \"test message\");io::stdout().flush().unwrap();\n")
+  end
+
+  it 'understands meta commands' do
+    ast = Parser::Ruby22.parse("rust_variable 'my_var'; my_var = 123")
+    expect(subject.generate(ast)).to eq("\nmy_var = 123;")
+  end
+
+  it 'supports matrix index assignment' do
+    ast = Parser::Ruby22.parse <<-eos
+      rust_variable "m"
+      m[2][3] = 123
+    eos
+    expect(subject.generate(ast)).to eq("m[2 as usize][3 as usize]=123")
+  end
 end
