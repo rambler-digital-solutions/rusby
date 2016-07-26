@@ -73,6 +73,6 @@ describe Rusby::Rust do
       rust_variable "m"
       m[2][3] = 123
     eos
-    expect(subject.generate(ast)).to eq("m[2 as usize][3 as usize]=123")
+    expect(subject.generate(ast)).to eq("\nm[2 as usize][3 as usize]=123")
   end
 end

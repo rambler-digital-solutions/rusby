@@ -58,8 +58,8 @@ module Rusby
         object
       )
 
-      wrapped_rust_method = lambda do |*args|
-        object.class.rusby_ffi_wrapper(method_name, rust_method, args)
+      wrapped_rust_method = lambda do |*wrapped_args|
+        object.class.rusby_ffi_wrapper(method_name, rust_method, wrapped_args)
       end
 
       # check if rust method is running faster than the original one

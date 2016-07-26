@@ -93,7 +93,7 @@ module Rusby
         '// this function folds ffi arguments and unfolds result to ffi types'
       ]
       result << "#{rust.exposed_method_prefix} fn ffi_#{method_name}(#{args.join(', ')}) -> #{rust.rust_to_ffi_types[return_type] || rust.rust_types[return_type]} {"
-      args = arg_names.each_with_index.map do |arg_name, i|
+      arg_names.each_with_index.map do |arg_name, i|
         next unless rust.ffi_to_rust[arg_types[i]] # for simple args we don't need any convertion
         result << rust.ffi_to_rust[arg_types[i]].gsub('<name>', arg_name).to_s
       end

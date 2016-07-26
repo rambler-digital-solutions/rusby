@@ -24,11 +24,7 @@ module Rusby
         print "\r|#{'=' * percent}#{'-' * (100 - percent)}|"
       end
 
-      boost = if m1 > m2
-                m1 / m2
-              else
-                - m2 / m1
-      end
+      boost = m1 > m2 ? m1 / m2 : - m2 / m1
 
       printf "\r=> got #{'%.2fx boost'.colorize(boost > 0 ? :green : :red)} (%.2fs original vs %.2fs rust) %s\n\n", boost, m1, m2, ' ' * 80
 

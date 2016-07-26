@@ -7,15 +7,13 @@ module Rusby
           return case ast
                  when :length
                    '.len()'
-                 when :new
-                   '<new>'
                  when :min
                    '.iter().max()'
                  else
                    ast.to_s
-          end
+                end
         end
-        result = send("generate_#{ast.type.to_s.tr('-', '_')}", ast)
+        send("generate_#{ast.type.to_s.tr('-', '_')}", ast)
       end
 
       def generate_send(ast)
