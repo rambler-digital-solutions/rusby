@@ -10,7 +10,7 @@ module Rusby
 
       def generate_return(ast)
         ri = ast.children.map { |node| generate(node) }
-        "return #{ri.any? ? ri.join(',') : '&-ptr'} as i32;"
+        "return #{ri.any? ? ri.join(',') : '&-ptr'};"
       end
 
       def generate_kwbegin(ast)

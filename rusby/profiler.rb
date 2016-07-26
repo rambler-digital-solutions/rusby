@@ -4,7 +4,7 @@ module Rusby
   module Profiler
     extend self
 
-    SQRT_ITERATIONS = Math.sqrt(10_000).to_i
+    SQRT_ITERATIONS = Math.sqrt(1000).to_i
 
     def timeit(target_method, *args)
       Benchmark.realtime { SQRT_ITERATIONS.times { target_method.call(*args) } }

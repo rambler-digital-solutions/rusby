@@ -4,7 +4,13 @@ module Rusby
       def generate_lvasgn(ast)
         variable = ast.children[0]
         return variable if ast.children.size == 1
-        "#{'let mut ' unless recollect_variable?(variable)}#{variable} = #{generate(ast.children[1])};"
+
+        result = "#{variable} = #{generate(ast.children[1])};"
+        unless known_variable?(variable)
+          result = "let mut #{result}"
+          remember_variable(variable)
+        end
+        result
       end
 
       def generate_lvar(ast)
@@ -21,7 +27,7 @@ module Rusby
           "let lv#{i} = #{generate(right[i])};"
         end
         result += left.each_with_index.map do |statement, i|
-          "#{generate(statement)} = lv#{i};"
+          "#{generate(statement)} lv#{i};"
         end
         result.join("\n")
       end

@@ -17,21 +17,21 @@ module Rusby
       @meta = meta
     end
 
-    def recollect_method?(name)
-      method_name = name.to_sym
-      result = @known_methods.include?(method_name)
-      @known_methods << method_name
-      result
+    def known_method?(name)
+      @known_methods.include?(name.to_sym)
     end
-    alias remember_method recollect_method?
 
-    def recollect_variable?(name)
-      variable = name.to_sym
-      result = @known_methods.include?(variable)
-      @known_variables << variable
-      result
+    def remember_method(name)
+      @known_methods << name.to_sym
     end
-    alias remember_variable recollect_variable?
+
+    def known_variable?(name)
+      @known_variables.include?(name.to_sym)
+    end
+
+    def remember_variable(name)
+      @known_variables << name.to_sym
+    end
 
     def fold_arrays(nodes)
       result = []
@@ -47,18 +47,18 @@ module Rusby
         else
           code = generate(node)
           if index_op
-            code = "[#{code}]"
+            code = "[#{code} as usize]"
             index_op = false
           end
           if index_assignment_op
-            code = "[#{code}]="
+            code = "[#{code} as usize]="
             index_assignment_op = false
           end
           result << code
         end
       end
 
-      result.join
+      result
     end
 
     def method_missing(method_name, *args)
