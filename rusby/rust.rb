@@ -11,10 +11,10 @@ module Rusby
     include ::Rusby::Generators::Strings
     include ::Rusby::Generators::Types
 
-    def initialize(meta)
+    def initialize(return_type)
       @known_methods = []
       @known_variables = []
-      @meta = meta
+      @return_type = return_type
     end
 
     def known_method?(name)

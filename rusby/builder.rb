@@ -54,7 +54,7 @@ module Rusby
 
     def rust_method_body(meta, ast)
       name = ast.children.first
-      rust = Rust.new(meta)
+      rust = Rust.new(@rust.rust_types[meta[:result]])
       rust.remember_method(name)
 
       result = ''
