@@ -1,46 +1,54 @@
-# Quickstart
+## About
+
+**Rusby** is a *Ruby* to *Rust* transpiler for simple performance-oriented methods.
+
+Computations in plain Ruby are painfully slow.
+Almost all internal methods in of Ruby are implemented in C, thus achieving acceptable performance on e.g. [Array#sort](https://github.com/ruby/ruby/blob/trunk/array.c).
+
+On the other hand extension of ruby code with C or other low-level language functions is not to say hard... but at least is tricky. **Rusby** allows to write simple methods in plain ruby and convert them to rust with zero modifications.
+
+Just mark method with `rusby!` and you are ready to rust :/
+
+![Quicksort example](https://raw.githubusercontent.com/rambler-digital-solutions/rusby/master/doc/img1.png)
+
+---
+
+N.B. It's a research project, so at least test for edge cases (e.g. overflows) before production usage.
+
+Transpilation was tested only on cases in `./examples` directory.
+
+---
+
+## How it works?
+
+1. You prefix your method definition with `!rusby`.
+1. Native Ruby method is ran for the first time.
+1. Its arguments types and return type are recorded.
+1. These data along with source code of the method (as AST tree) are passed to the Rusby::Builder.
+1. Rusby::Builder calls Rusby::Rust, which recursively generates rust code based on AST tree (Rusby::Generators::\*).
+1. Few hacks are applied along the way, see Rusby::Preprocessor, Rusby::Postrocessor.
+1. Generated Rust code is dumped to file into `./lib` Dir
+1. Rust code is prettified and compiled into dynamic lib.
+1. At last we have ruby method and rust counterpart linked via [FFI](https://github.com/ffi/ffi).
+1. Benchmark them and find the fastest one.
+1. Link the winner into the source class.
+1. Profit.
+
+## Features
+- In-place ruby/rust method swapping based on benchmarks
+- Recursive calls transpiling
+- Nested functions transpiling
+- Limited string operations support
+- Integer matrix manipulation support
+
+## Quickstart
 ```
+brew install rust # or similar
 bundle
-ruby boot.rb
+ruby run_examples.rb
 ```
 
-## Notes
-https://github.com/michaelfairley/method_decorators
-
-Thread-safe fiddle:
+## Tests
 ```
--> first run of plusplus
-Measure Mode: wall_time
-Thread ID: 70183264051680
-Fiber ID: 70183284493160
-Total: 0.114449
-Sort by: self_time
-
- %self      total      self      wait     child     calls  name
- 43.71      0.114     0.050     0.000     0.064        1   Integer#times
- 31.39      0.064     0.036     0.000     0.028   100000   Method#call
- 24.87      0.028     0.028     0.000     0.000   100000   FanaticPluser#plusplus
-  0.03      0.114     0.000     0.000     0.114        1   Object#timeit
-  0.01      0.000     0.000     0.000     0.000        1   Float#to_i
-
-* indicates recursively called methods
-Compiling int plusplus(int)...
--> second run of plusplus
-★★★  Running Rust! Yeeeah Baby! ★★★
-Measure Mode: wall_time
-Thread ID: 70183264051680
-Fiber ID: 70183284493160
-Total: 0.384716
-Sort by: self_time
-
- %self      total      self      wait     child     calls  name
- 23.66      0.167     0.091     0.000     0.076   100000   <Module::Fiddle>#last_error=
- 23.38      0.257     0.090     0.000     0.167   100000   Fiddle::Function#call
- 19.53      0.385     0.075     0.000     0.310        1   Integer#times
- 13.58      0.310     0.052     0.000     0.257   100000   Rusby::Proxy#plusplus
- 10.80      0.042     0.042     0.000     0.000   200000   Thread#[]=
-  9.05      0.035     0.035     0.000     0.000   200000   <Class::Thread>#current
-  0.00      0.385     0.000     0.000     0.385        1   Object#timeit
-  0.00      0.000     0.000     0.000     0.000        1   Float#to_i
-
+rspec spec
 ```
