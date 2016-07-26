@@ -9,13 +9,13 @@ module Rusby
       end
 
       def generate_return(ast)
-        ri = ast.children.map { |node| generate(node) }
-        "return #{ri.any? ? ri.join(',') : '&-ptr'};"
+        statements = ast.children.map { |node| generate(node) }
+        "return #{statements.any? ? statements.join(',') : '&-ptr'};"
       end
 
       def generate_kwbegin(ast)
-        ri = ast.children.map { |node| generate(node) }
-        ri.join(';')
+        statements = ast.children.map { |node| generate(node) }
+        statements.join(';')
       end
     end
   end

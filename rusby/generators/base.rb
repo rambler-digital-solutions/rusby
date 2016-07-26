@@ -46,7 +46,6 @@ module Rusby
 
       def generate_block(ast)
         block_operator = ast.children[0].children[1]
-        ri = ast.children[1..-1].map { |node| generate(node) }.compact
         case block_operator
         when :loop
           generate_loop(ast)
@@ -55,7 +54,8 @@ module Rusby
         when :rust
           ast.children[1..-1].to_s
         else
-          "#{ast.children[0].children[1]} {\n#{ri.join("\n")}\n}"
+          statements = ast.children[1..-1].map { |node| generate(node) }.compact
+          "#{ast.children[0].children[1]} {\n#{statements.join("\n")}\n}"
         end
       end
     end

@@ -47,11 +47,11 @@ module Rusby
         else
           code = generate(node)
           if index_op
-            code = "[#{code} as usize]"
+            code = "[#{code.to_s =~ /[+-]/ ? "(#{code})" : code} as usize]"
             index_op = false
           end
           if index_assignment_op
-            code = "[#{code} as usize]="
+            code = "[#{code.to_s =~ /[+-]/ ? "(#{code})" : code} as usize]="
             index_assignment_op = false
           end
           result << code

@@ -6,10 +6,9 @@ module Rusby
         return variable if ast.children.size == 1
 
         result = "#{variable} = #{generate(ast.children[1])};"
-        unless known_variable?(variable)
-          result = "let mut #{result}"
-          remember_variable(variable)
-        end
+        result = "let mut #{result}" unless known_variable?(variable)
+        remember_variable(variable)
+
         result
       end
 
