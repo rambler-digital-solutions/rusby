@@ -4,6 +4,7 @@ module Rusby
       def generate(ast)
         unless ast.respond_to?(:type)
           # ok, it's not ast node, but it could be a method
+          # redefine internal ruby methods as needed
           return case ast
                  when :length
                    '.len()'
@@ -22,6 +23,8 @@ module Rusby
         else
           verb = ast.children[1]
           case verb
+          when :rand
+            '1; let mut rng = rand::thread_rng(); //Range::new(0.0, 1.0).ind_sample(rand::thread_rng())'
           when :puts
             "\nprintln!(\"{}\", #{generate(ast.children[2])});io::stdout().flush().unwrap();\n"
           # argument of this ruby method is rust code "as is"
@@ -49,6 +52,8 @@ module Rusby
           generate_loop(ast)
         when :each
           generate_each_loop(ast)
+        when :each_with_index
+          generate_each_with_index_loop(ast)
         when :rust
           ast.children[1..-1].to_s
         else

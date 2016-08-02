@@ -1,0 +1,13 @@
+[package]
+name = "main"
+version = "0.0.1"
+authors = ["Jorge Aparicio <japaricious@gmail.com>",
+           "Steve Klabnik <steve@steveklabnik.com>"]
+
+[dependencies]
+
+rand = "0.3"
+
+[lib]
+
+crate-type = ["rlib","dylib"]

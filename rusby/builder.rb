@@ -44,7 +44,7 @@ module Rusby
         meta[method_name][:result]
       )
       puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})".colorize(:yellow)
-      puts `rustc --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
+      puts `rustc --extern rand=./rand/target/debug/librand.rlib,libc=./rand/target/debug/deps/liblibc-1f3392fe1afd1313.rlib -A unused_imports --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
 
       Proxy.rusby_load "#{root_path}/lib/#{method_name}"
       Proxy.attach_function "ffi_#{method_name}", *signature

@@ -7,7 +7,29 @@ module Rusby
       end
 
       def generate_each_loop(ast)
-        # only works with numeric range e.g. (1..10).each {|i| ...}
+        if ast.children[0].children[0].type == :lvar
+          generate_each_loop_plain(ast)
+        else
+          generate_each_loop_range(ast)
+        end
+      end
+
+      def generate_each_loop_plain(ast)
+        collection = ast.children[0].children[0].children[0]
+        variable = ast.children[1].children[0].children[0]
+        "for #{variable} in #{collection} {
+        }"
+      end
+
+      def generate_each_with_index_loop(ast)
+        collection = ast.children[0].children[0].children[0]
+        variable = ast.children[1].children[0].children[0]
+        index = ast.children[1].children[1].children[0]
+        "for (#{index}, #{variable}) in #{collection}.iter().enumerate() {
+        }"
+      end
+
+      def generate_each_loop_range(ast)
         range = ast.children[0].children[0].children[0]
         range_start = range.children[0].children[0]
         range_end = "(#{range.children[1].children[0]} + 1)" # rust range is inclusive

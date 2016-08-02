@@ -8,6 +8,10 @@ module Rusby
       def generate_args(_ast)
       end
 
+      def generate_and(ast)
+         "#{generate(ast.children[0])} && #{generate(ast.children[1])}"
+      end
+
       def generate_return(ast)
         statements = ast.children.map { |node| generate(node) }
         "return #{statements.any? ? statements.join(',') : '&-ptr'} as #{@return_type};"

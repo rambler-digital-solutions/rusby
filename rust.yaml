@@ -23,12 +23,14 @@ ffi_types:
   String: 'string'
 
 file_header: |
-  #[allow(unused_imports)]
+  extern crate rand;
+
   use std::io::{self, Write};
-  #[allow(unused_imports)]
   use std::ffi::{CStr,CString};
-  #[allow(unused_imports)]
   use std::os::raw::c_char;
+  use rand::distributions::{IndependentSample, Range};
+  use rand::Rng;
+
 
 method_prefix: "\n#[allow(unused_mut)]"
 exposed_method_prefix: |
