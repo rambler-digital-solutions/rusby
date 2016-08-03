@@ -4,16 +4,16 @@ class WeightedRandom
   rusby!
   def pick(weights, seed)
     sum = 0.0
-    weightsL = []
-    weightsR = []
-    weights.each do |weight|
-      weightsL << sum
-      weightsR << sum + weight
-      sum += weight
+    left_bounds = []
+    right_bounds = []
+    weights.each do |item|
+      left_bounds << sum
+      sum = sum + item
+      right_bounds << sum
     end
     number = seed * sum
-    weights.each_with_index do |weight, i|
-      if (number >= weightsL[i] && number < weightsR[i])
+    weights.each_with_index do |_, i|
+      if (number >= left_bounds[i] && number < right_bounds[i])
         return i
       end
     end

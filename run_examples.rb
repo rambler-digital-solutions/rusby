@@ -29,7 +29,7 @@ Dir['./examples/*.rb'].each { |file| require file }
 # end
 
 randomizer = WeightedRandom.new
-weights = (1..10).map { rand(1000) }
+weights = (1..100000).map { rand(1000).to_f }
 2.times do |i|
   puts "#{i + 1}: #{randomizer.pick(weights, rand())}"
 end
