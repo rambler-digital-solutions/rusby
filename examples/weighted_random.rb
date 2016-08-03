@@ -2,17 +2,18 @@ class WeightedRandom
   extend Rusby::Core
 
   rusby!
-  def pick(weights)
-    sum = 0
+  def pick(weights, seed)
+    sum = 0.0
     weightsL = []
     weightsR = []
     weights.each do |weight|
       weightsL << sum
       weightsR << sum + weight
+      sum += weight
     end
-    sample = rand() * sum
+    number = seed * sum
     weights.each_with_index do |weight, i|
-      if (sample >= weightsL[i] && sample < weightsR[i])
+      if (number >= weightsL[i] && number < weightsR[i])
         return i
       end
     end

@@ -5,6 +5,10 @@ module Rusby
         ast.children[0]
       end
 
+      def generate_float(ast)
+        ast.children[0]
+      end
+
       def generate_str(ast)
         "\"#{ast.children[0]}\""
       end

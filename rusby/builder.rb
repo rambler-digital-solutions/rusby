@@ -44,7 +44,7 @@ module Rusby
         meta[method_name][:result]
       )
       puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})".colorize(:yellow)
-      puts `rustc --extern rand=./rand/target/debug/librand.rlib,libc=./rand/target/debug/deps/liblibc-1f3392fe1afd1313.rlib -A unused_imports --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
+      puts `rustc -A unused_imports --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
 
       Proxy.rusby_load "#{root_path}/lib/#{method_name}"
       Proxy.attach_function "ffi_#{method_name}", *signature
@@ -53,6 +53,7 @@ module Rusby
     end
 
     def rust_method_body(meta, ast)
+      p ast
       name = ast.children.first
       rust = Rust.new(@rust.rust_types[meta[:result]])
       rust.remember_method(name)
@@ -126,7 +127,15 @@ module Rusby
     end
 
     def construct_signature(arg_types, return_type)
-      args = arg_types.map { |arg| rust.ffi_types[arg].to_sym }
+      args = arg_types.map do |arg|
+        rust_type = rust.ffi_types[arg]
+        unless rust_type
+          puts "Please define mapping from '#{arg}' " \
+            "to rust equivalent in rust.yaml".colorize(:red)
+          raise "Missing mapping"
+        end
+        rust_type.to_sym
+      end
       [
         args.map { |arg| arg == :pointer ? [arg, :int] : arg }.flatten,
         rust.ffi_types[return_type].to_sym

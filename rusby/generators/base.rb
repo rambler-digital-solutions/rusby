@@ -6,10 +6,12 @@ module Rusby
           # ok, it's not ast node, but it could be a method
           # redefine internal ruby methods as needed
           return case ast
+          when :<< || :>>
+                   ast
                  when :length
                    '.len()'
                  when :min
-                   '.iter().max()'
+                   '.iter().min()'
                  else
                    ast.to_s
                 end
@@ -23,8 +25,6 @@ module Rusby
         else
           verb = ast.children[1]
           case verb
-          when :rand
-            '1; let mut rng = rand::thread_rng(); //Range::new(0.0, 1.0).ind_sample(rand::thread_rng())'
           when :puts
             "\nprintln!(\"{}\", #{generate(ast.children[2])});io::stdout().flush().unwrap();\n"
           # argument of this ruby method is rust code "as is"

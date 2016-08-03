@@ -10,8 +10,10 @@ module Rusby
           code.gsub!(/;+/, ';')
         end
       end
+      # process array :<< and :>> operator
+      code.gsub!(/(?:<<|>>)(\S+)/, '.push(\1);')
+
       code
     end
   end
 end
-  

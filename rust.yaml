@@ -10,28 +10,22 @@ rust_to_ffi:
 rust_to_ffi_types:
   Array[Fixnum]: '*const i32'
   String: '*const c_char'
-
 rust_types:
   Fixnum: 'i32'
   Array[Fixnum]: '&mut [i32]'
   NilClass: '()'
   String: 'String'
+  Float: 'f64'
 ffi_types:
   Fixnum: 'int'
   Array[Fixnum]: 'pointer'
   NilClass: 'void'
   String: 'string'
-
+  Float: 'double'
 file_header: |
-  extern crate rand;
-
   use std::io::{self, Write};
   use std::ffi::{CStr,CString};
   use std::os::raw::c_char;
-  use rand::distributions::{IndependentSample, Range};
-  use rand::Rng;
-
-
 method_prefix: "\n#[allow(unused_mut)]"
 exposed_method_prefix: |
   #[no_mangle]
