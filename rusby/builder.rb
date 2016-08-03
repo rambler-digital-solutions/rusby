@@ -53,7 +53,6 @@ module Rusby
     end
 
     def rust_method_body(meta, ast)
-      p ast
       name = ast.children.first
       rust = Rust.new(@rust.rust_types[meta[:result]])
       rust.remember_method(name)
@@ -131,8 +130,8 @@ module Rusby
         rust_type = rust.ffi_types[arg]
         unless rust_type
           puts "Please define mapping from '#{arg}' " \
-            "to rust equivalent in rust.yaml".colorize(:red)
-          raise "Missing mapping"
+            'to rust equivalent in rust.yaml'.colorize(:red)
+          raise 'Missing mapping'
         end
         rust_type.to_sym
       end

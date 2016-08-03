@@ -17,7 +17,7 @@ module Rusby
       def generate_each_loop_plain(ast)
         collection = ast.children[0].children[0].children[0]
         variable = ast.children[1].children[0].children[0]
-        body = ast.children[2..-1].map{|node| generate(node)}.join("\n")
+        body = ast.children[2..-1].map { |node| generate(node) }.join("\n")
         "for #{variable} in #{collection}.iter() {
           #{body}
         }"
@@ -27,7 +27,7 @@ module Rusby
         collection = ast.children[0].children[0].children[0]
         variable = ast.children[1].children[0].children[0]
         index = ast.children[1].children[1].children[0]
-        body = ast.children[2..-1].map{|node| generate(node)}.join("\n")
+        body = ast.children[2..-1].map { |node| generate(node) }.join("\n")
         "for (#{index}, #{variable}) in #{collection}.iter().enumerate() {
           #{body}
         }"

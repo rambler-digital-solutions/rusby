@@ -6,7 +6,7 @@ module Rusby
           # ok, it's not ast node, but it could be a method
           # redefine internal ruby methods as needed
           return case ast
-          when :<< || :>>
+                 when :<< || :>>
                    ast
                  when :length
                    '.len()'

@@ -9,7 +9,7 @@ module Rusby
       end
 
       def generate_and(ast)
-         "#{generate(ast.children[0])} && #{generate(ast.children[1])}"
+        "#{generate(ast.children[0])} && #{generate(ast.children[1])}"
       end
 
       def generate_return(ast)
