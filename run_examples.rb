@@ -2,7 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 Bundler.require
-Dir['./rusby/**/*.rb'].each { |file| require file }
+Dir['./app/**/*.rb'].each { |file| require file }
 Dir['./examples/*.rb'].each { |file| require file }
 
 pluser = FanaticPluser.new
