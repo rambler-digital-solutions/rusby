@@ -44,6 +44,7 @@ Transpilation was tested only on cases in `./examples` directory.
 ## Quickstart
 ```
 brew install rust # or similar
+cd examples
 bundle
 ruby run_examples.rb
 ```

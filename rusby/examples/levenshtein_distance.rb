@@ -1,4 +1,4 @@
-class Levenshtein
+class LevenshteinDistance
   extend Rusby::Core
 
   rusby!
