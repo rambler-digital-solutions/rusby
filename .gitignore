@@ -1,3 +1,2 @@
-*.dylib
-lib/*
 .byebug_history
+tmp/rusby/*

@@ -2,7 +2,6 @@ require 'rubygems'
 require 'bundler/setup'
 
 Bundler.require
-Dir['./app/**/*.rb'].each { |file| require file }
 Dir['./examples/*.rb'].each { |file| require file }
 
 pluser = FanaticPluser.new

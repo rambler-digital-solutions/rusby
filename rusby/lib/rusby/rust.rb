@@ -1,5 +1,3 @@
-Dir['./generators/*.rb'].each { |file| require file }
-
 module Rusby
   class Rust
     include ::Rusby::Generators::Base

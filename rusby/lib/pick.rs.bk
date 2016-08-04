@@ -1,0 +1,32 @@
+use std::io::{self, Write};
+use std::ffi::{CStr,CString};
+use std::os::raw::c_char;
+
+// this function folds ffi arguments and unfolds result to ffi types
+#[no_mangle]
+pub extern "C"
+ fn ffi_pick(weights_pointer: *mut f64, weights_size: usize, seed: f64) -> i32 {
+let weights = unsafe { std::slice::from_raw_parts_mut(weights_pointer, weights_size) };
+let result = pick(weights, seed);
+return result;
+}
+
+#[allow(unused_mut)]
+fn pick(weights: &mut [f64], seed: f64) -> i32 {
+let mut sum = 0.0;
+let mut left_bounds = Vec::new();
+let mut right_bounds = Vec::new();
+for item in weights.iter() {
+          left_bounds.push(sum);
+sum = sum+item;
+right_bounds.push(sum);
+        }
+let mut number = seed*sum;
+for (i, _) in weights.iter().enumerate() {
+          if number>=left_bounds[i as usize] && number<right_bounds[i as usize] {
+return i as i32;
+}
+
+        }
+return -1 as i32;
+}

@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'rusby/version'
+require 'rusby'
 
 Gem::Specification.new do |spec|
   spec.name          = "rusby"
@@ -30,4 +30,12 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "byebug"
+
+  spec.add_runtime_dependency 'method_source'
+  spec.add_runtime_dependency 'ffi'
+  spec.add_runtime_dependency 'hashie'
+  spec.add_runtime_dependency 'colorize'
+  spec.add_runtime_dependency 'parser'
+  spec.add_runtime_dependency 'ruby-prof'
 end

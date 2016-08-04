@@ -1,3 +1,5 @@
+require 'ffi'
+
 module Rusby
   module FFI
     class Bridge

@@ -1,0 +1,48 @@
+use std::io::{self, Write};
+use std::ffi::{CStr,CString};
+use std::os::raw::c_char;
+
+// this function folds ffi arguments and unfolds result to ffi types
+#[no_mangle]
+pub extern "C"
+ fn ffi_quicksort(a_pointer: *mut i32, a_size: usize, lo: i32, hi: i32) -> *const i32 {
+let a = unsafe { std::slice::from_raw_parts_mut(a_pointer, a_size) };
+let result = quicksort(a, lo, hi);
+return result.as_ptr();
+}
+
+#[allow(unused_mut)]
+fn quicksort(a: &mut [i32], lo: i32, hi: i32) -> &mut [i32] {
+if !(lo<hi) {
+return a as &mut [i32];
+}
+
+let mut pivot = internal_method_partition(a, lo, hi);;
+quicksort(a, lo, pivot);
+quicksort(a, pivot+1, hi);
+a
+}
+#[allow(unused_mut)]
+fn internal_method_partition(a: &mut [i32], lo: i32, hi: i32) -> i32 {
+let mut pivot = a[lo as usize];
+let mut i = lo-1;
+let mut j = hi+1;
+loop {
+while {
+i += 1;
+a[i as usize]<pivot
+}{}
+while {
+j -= 1;
+a[j as usize]>pivot
+}{}
+if i>=j {
+return j as i32;
+}
+
+let lv0 = a[j as usize];
+let lv1 = a[i as usize];
+a[i as usize]=lv0;
+a[j as usize]=lv1;
+}
+}

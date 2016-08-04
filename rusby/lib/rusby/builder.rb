@@ -1,12 +1,16 @@
-require 'parser/ruby22'
-require 'yaml'
-
 module Rusby
   module Builder
     extend self
 
     def root_path
-      @root ||= File.expand_path('../..', __FILE__)
+      @root ||= File.expand_path('../../..', __FILE__)
+    end
+
+    def lib_path
+      return @lib_path if @lib_path
+      path = './tmp/rusby'
+      Dir.mkdir(path) unless Dir.exists?(path)
+      @lib_path = path
     end
 
     def rust
@@ -22,13 +26,13 @@ module Rusby
       code = expand_internal_methods(meta, code, owner)
       code = Postrocessor.apply(code, meta[method_name])
 
-      File.open("#{root_path}/lib/#{method_name}.rs", 'w') do |file|
+      File.open("#{lib_path}/#{method_name}.rs", 'w') do |file|
         file.write(code)
       end
-      `rustfmt #{root_path}/lib/#{method_name}.rs`
+      `rustfmt #{lib_path}/#{method_name}.rs`
 
       puts 'Done generating source code'.colorize(:yellow)
-      File.open("#{root_path}/lib/#{method_name}.rs") do |file|
+      File.open("#{lib_path}/#{method_name}.rs") do |file|
         code = file.read
         code.split("\n").each_with_index do |line, i|
           puts "#{(i + 1).to_s.rjust(3).colorize(:light_black)}.  #{line}"
@@ -44,9 +48,9 @@ module Rusby
         meta[method_name][:result]
       )
       puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})".colorize(:yellow)
-      puts `rustc -A unused_imports --crate-type=dylib -O -o #{root_path}/lib/#{method_name}.dylib #{root_path}/lib/#{method_name}.rs`
+      puts `rustc -A unused_imports --crate-type=dylib -O -o #{lib_path}/#{method_name}.dylib #{lib_path}/#{method_name}.rs`
 
-      Proxy.rusby_load "#{root_path}/lib/#{method_name}"
+      Proxy.rusby_load "#{lib_path}/#{method_name}"
       Proxy.attach_function "ffi_#{method_name}", *signature
 
       Proxy.method("ffi_#{method_name}")
@@ -55,7 +59,7 @@ module Rusby
     def rust_method_body(meta, ast)
       name = ast.children.first
       rust = Rust.new(@rust.rust_types[meta[:result]])
-      rust.remember_method(name)
+      rust.remember_method(nGSame)
 
       result = ''
       ast.children[2..-1].each do |node|
