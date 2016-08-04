@@ -49,6 +49,33 @@ bundle
 ruby run_examples.rb
 ```
 
+or
+
+```
+gem install rusby
+```
+
+Create file test.rb:
+```
+require 'rusby'
+
+class FanaticGreeter
+  extend Rusby::Core
+
+  rusby!
+  def greet(name)
+    "Hello, #{name}!"
+  end
+end
+
+greeter = FanaticGreeter.new
+2.times { greeter.greet('Ash') }
+```
+
+```
+ruby test.rb
+```
+
 ## Tests
 ```
 rake spec
