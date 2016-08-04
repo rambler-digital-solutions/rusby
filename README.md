@@ -42,7 +42,7 @@ Transpilation was tested only on cases in `./examples` directory.
 - Integer matrix manipulation support
 
 ## Quickstart
-```
+```shell
 brew install rust # or similar
 cd examples
 bundle
@@ -51,12 +51,12 @@ ruby run_examples.rb
 
 or
 
-```
+```shell
 gem install rusby
 ```
 
 Create file test.rb:
-```
+```ruby
 require 'rusby'
 
 class FanaticGreeter
@@ -72,18 +72,18 @@ greeter = FanaticGreeter.new
 2.times { greeter.greet('Ash') }
 ```
 
-```
+```shell
 ruby test.rb
 ```
 
 ## Tests
-```
+```shell
 rake spec
 ```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/rusby. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/rambler-digital-solutions/rusby. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
