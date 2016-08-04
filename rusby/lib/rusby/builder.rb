@@ -59,7 +59,7 @@ module Rusby
     def rust_method_body(meta, ast)
       name = ast.children.first
       rust = Rust.new(@rust.rust_types[meta[:result]])
-      rust.remember_method(nGSame)
+      rust.remember_method(name)
 
       result = ''
       ast.children[2..-1].each do |node|

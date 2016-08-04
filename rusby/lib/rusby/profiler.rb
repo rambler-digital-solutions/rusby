@@ -1,5 +1,3 @@
-require 'benchmark'
-
 module Rusby
   module Profiler
     extend self
