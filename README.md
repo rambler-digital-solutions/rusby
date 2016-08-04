@@ -51,7 +51,7 @@ ruby run_examples.rb
 
 ## Tests
 ```
-rspec spec
+rake spec
 ```
 
 ## Contributing
