@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'hashie'
   spec.add_runtime_dependency 'colorize'
   spec.add_runtime_dependency 'parser'
-  spec.add_runtime_dependency 'ruby-prof'
 
   spec.require_paths = [
     "lib"
