@@ -24,7 +24,8 @@ module Rusby
 
       boost = m1 > m2 ? m1 / m2 : - m2 / m1
 
-      printf "\r=> got #{'%.2fx boost'.colorize(boost > 0 ? :green : :red)} (%.2fs original vs %.2fs rust) %s\n\n", boost, m1, m2, ' ' * 80
+      printf "\r=> got #{'%.2fx boost'.colorize(boost > 0 ? :green : :red)}" \
+        " (%.2fs original vs %.2fs rust) %s\n\n", boost, m1, m2, ' ' * 80
 
       boost
     end

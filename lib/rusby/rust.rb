@@ -60,7 +60,8 @@ module Rusby
     end
 
     def method_missing(method_name, *args)
-      puts "No method for '#{method_name.to_s.sub('generate_', '')}' AST node.".colorize(:red)
+      puts "No method for '#{method_name.to_s.sub('generate_', '')}'" \
+        ' AST node.'.colorize(:red)
       puts "Please implement #{method_name} in Rusby::Rust.".colorize(:yellow)
       puts "Arguments: #{args.inspect}".colorize(:yellow)
       raise RuntimeError

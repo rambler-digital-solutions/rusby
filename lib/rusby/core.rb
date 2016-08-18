@@ -21,14 +21,17 @@ module Rusby
       bound_method = method_reference.bind(object)
       result = bound_method.call(*args)
 
-      @rusby_method_table[method_name][:args] = args.map { |arg| rusby_type(arg) }
+      @rusby_method_table[method_name][:args] = args.map do |arg|
+        rusby_type(arg)
+      end
       @rusby_method_table[method_name][:result] = rusby_type(result)
 
       if @rusby_method_table[method_name][:exposed]
         # try to convert to rust or return back the original method
         rusby_convert_or_bust(method_name, method_reference, object, args)
       else
-        # if we don't need to convert method to rust return back the original method
+        # if we don't need to convert method to
+        # rust return back the original method
         rusby_replace_method(method_name, method_reference)
       end
 
@@ -63,8 +66,14 @@ module Rusby
       end
 
       # check if rust method is running faster than the original one
-      puts 'Benchmarking native and rust methods (intertwined pattern)'.colorize(:yellow)
-      boost = Profiler.benchit(object, method_reference, wrapped_rust_method, args)
+      puts "Benchmarking native and rust methods" \
+        " (intertwined pattern)".colorize(:yellow)
+      boost = Profiler.benchit(
+        object,
+        method_reference,
+        wrapped_rust_method,
+        args
+      )
 
       # coose between rust and ruby methods
       resulting_method = method_reference

@@ -48,8 +48,13 @@ module Rusby
         meta[method_name][:args],
         meta[method_name][:result]
       )
-      puts "Compiling #{signature.last} #{method_name}(#{signature.first.join(', ')})".colorize(:yellow)
-      puts `rustc -A unused_imports --crate-type=dylib -O -o #{lib_path}/#{method_name}.dylib #{lib_path}/#{method_name}.rs`
+      puts "Compiling #{signature.last} #{method_name}" \
+        "(#{signature.first.join(', ')})".colorize(:yellow)
+      command = 'rustc -A unused_imports --crate-type=dylib '
+      command += "-O -o #{lib_path}/#{method_name}.dylib "
+      command += "#{lib_path}/#{method_name}.rs"
+      puts `#{command}`
+
 
       Proxy.rusby_load "#{lib_path}/#{method_name}"
       Proxy.attach_function "ffi_#{method_name}", *signature
@@ -97,12 +102,17 @@ module Rusby
         '',
         '// this function folds ffi arguments and unfolds result to ffi types'
       ]
-      result << "#{rust.exposed_method_prefix} fn ffi_#{method_name}(#{args.join(', ')}) -> #{rust.rust_to_ffi_types[return_type] || rust.rust_types[return_type]} {"
+      result << "#{rust.exposed_method_prefix} fn " \
+        "ffi_#{method_name}(#{args.join(', ')}) -> " \
+        "#{rust.rust_to_ffi_types[return_type] || rust.rust_types[return_type]}" \
+        ' {'
       arg_names.each_with_index.map do |arg_name, i|
-        next unless rust.ffi_to_rust[arg_types[i]] # for simple args we don't need any convertion
+        # for simple args we don't need any convertion
+        next unless rust.ffi_to_rust[arg_types[i]]
         result << rust.ffi_to_rust[arg_types[i]].gsub('<name>', arg_name).to_s
       end
-      result << "let result = #{method_name}(#{arg_names.join(', ')});" # calls the real method with ffi args folded
+      # calls the real method with ffi args folded
+      result << "let result = #{method_name}(#{arg_names.join(', ')});"
       result << "return #{rust.rust_to_ffi[return_type] || 'result'};"
       result << '}'
 
@@ -118,12 +128,19 @@ module Rusby
       arg_names = ast.children[1].children.map { |ch| ch.children[0].to_s }
       meta[:names] = arg_names
 
-      result = exposed ? ffi_wrapper(method_name, arg_names, arg_types, return_type) : []
+      result = []
+      if exposed
+        result = ffi_wrapper(method_name, arg_names, arg_types, return_type)
+      end
       result << rust.method_prefix
 
-      args = arg_names.each_with_index.map { |arg_name, i| "#{arg_name}: #{rust.rust_types[arg_types[i]]}" }
+      args = arg_names.each_with_index.map do |arg_name, i|
+        "#{arg_name}: #{rust.rust_types[arg_types[i]]}"
+      end
 
-      result << "fn #{exposed ? '' : 'internal_method_'}#{method_name}(#{args.join(', ')}) -> #{rust.rust_types[return_type]} {"
+      result << "fn #{exposed ? '' : 'internal_method_'}" \
+        "#{method_name}(#{args.join(', ')}) -> " \
+        "#{rust.rust_types[return_type]} {"
       result << rust_method_body(meta, ast)
       result << '}'
 
