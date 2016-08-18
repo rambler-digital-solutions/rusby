@@ -9,8 +9,8 @@ module Rusby
     def lib_path
       return @lib_path if @lib_path
       path = './tmp/rusby'
-      Dir.mkdir('./tmp') unless Dir.exists?('./tmp')
-      Dir.mkdir(path) unless Dir.exists?(path)
+      Dir.mkdir('./tmp') unless Dir.exist?('./tmp')
+      Dir.mkdir(path) unless Dir.exist?(path)
       @lib_path = path
     end
 

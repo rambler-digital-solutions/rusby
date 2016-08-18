@@ -43,7 +43,7 @@ Transpilation was tested only on cases in `./examples` directory.
 
 ## Quickstart
 ```shell
-curl -sSf https://static.rust-lang.org/rustup.sh | sh
+curl -sSf https://static.rust-lang.org/rustup.sh | sh # or install rust via your package manager
 git clone https://github.com/rambler-digital-solutions/rusby
 cd rusby/examples
 bundle

@@ -30,9 +30,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'ruby-prof'
 
   spec.require_paths = [
-    "lib",
-    "lib/rusby/",
-    "lib/rusby/generators/",
-    "lib/rusby/ffi/"
+    "lib"
   ]
 end

@@ -14,7 +14,8 @@ module Rusby
 
       def generate_return(ast)
         statements = ast.children.map { |node| generate(node) }
-        "return #{statements.any? ? statements.join(',') : '&-ptr'} as #{@return_type};"
+        "return #{statements.any? ? statements.join(',') : '&-ptr'}" \
+          " as #{@return_type};"
       end
 
       def generate_kwbegin(ast)

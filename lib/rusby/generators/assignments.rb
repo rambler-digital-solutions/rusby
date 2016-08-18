@@ -33,7 +33,8 @@ module Rusby
       end
 
       def generate_op_asgn(ast)
-        "#{generate(ast.children[0])} #{ast.children[1]}= #{generate(ast.children[2])}"
+        "#{generate(ast.children[0])} #{ast.children[1]}=" \
+          " #{generate(ast.children[2])}"
       end
     end
   end

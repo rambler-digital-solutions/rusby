@@ -2,16 +2,15 @@ module Rusby
   module Generators
     module Conditionals
       def generate_if(ast)
-        result = if ast.children[1]
-                   generate_regular_if(ast)
-                 else
-                   generate_unless(ast)
-        end
-        result.gsub(/^\s+/, '')
+        if ast.children[1]
+          generate_regular_if(ast)
+        else
+          generate_unless(ast)
+        end.gsub(/^\s+/, '')
       end
 
       def generate_unless(ast)
-        result = <<-EOF
+        <<-EOF
           if !(#{generate(ast.children[0])}) {
             #{generate(ast.children[2])}
           }
