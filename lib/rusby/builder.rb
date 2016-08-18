@@ -113,7 +113,7 @@ module Rusby
       arg_types = meta[:args]
       return_type = meta[:result]
 
-      ast = Parser::Ruby22.parse(source)
+      ast = Parser::CurrentRuby.parse(source)
       method_name = ast.children[0]
       arg_names = ast.children[1].children.map { |ch| ch.children[0].to_s }
       meta[:names] = arg_names

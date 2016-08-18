@@ -43,8 +43,9 @@ Transpilation was tested only on cases in `./examples` directory.
 
 ## Quickstart
 ```shell
-brew install rust # or similar
-cd examples
+curl -sSf https://static.rust-lang.org/rustup.sh | sh
+git clone https://github.com/rambler-digital-solutions/rusby
+cd rusby/examples
 bundle
 ruby run_examples.rb
 ```
