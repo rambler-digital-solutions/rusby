@@ -1,5 +1,6 @@
-## About
+## Overview
 
+[![Gem Version](https://badge.fury.io/rb/rusby.svg)](https://badge.fury.io/rb/rusby)
 [![Build Status](https://travis-ci.org/rambler-digital-solutions/rusby.svg?branch=master)](https://travis-ci.org/rambler-digital-solutions/rusby)
 
 **Rusby** is a *Ruby* to *Rust* transpiler for simple performance-oriented methods.
